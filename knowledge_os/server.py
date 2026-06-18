@@ -20,14 +20,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
-from . import overlays
+from . import overlays, corpus_overlays
 from .store import Store
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 _CT = {".html": "text/html", ".js": "text/javascript", ".css": "text/css"}
 
 
-def make_handler(store: Store):
+def make_handler(store: Store, corpus=None):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *a):  # quiet console for a non-technical user
             pass
@@ -54,6 +54,8 @@ def make_handler(store: Store):
             parts = [p for p in u.path.split("/") if p]
             try:
                 if not parts:
+                    return self._static("corpus.html" if corpus else "index.html")
+                if parts == ["lineages"]:
                     return self._static("index.html")
                 if parts[0] == "static" and len(parts) == 2:
                     return self._static(parts[1])
@@ -64,6 +66,8 @@ def make_handler(store: Store):
                 return self._json({"error": str(e)}, 500)
 
         def _api(self, parts, query):
+            if parts and parts[0] == "corpus":
+                return self._corpus_api(parts[1:], query)
             if parts == ["problems"]:
                 return self._json(store.problems())
 
@@ -103,7 +107,32 @@ def make_handler(store: Store):
 
             return self._json({"error": "unknown endpoint"}, 404)
 
+        def _corpus_api(self, parts, query):
+            if corpus is None:
+                return self._json({"error": "corpus not loaded — run: python -m knowledge_os.ingest"}, 503)
+            if parts == ["stats"]:
+                return self._json(corpus.stats())
+            if parts == ["subfields"]:
+                return self._json(corpus.subfields())
+            if parts == ["problems"]:
+                sf = (query.get("subfield") or [None])[0]
+                return self._json(corpus.problems(subfield_id=sf))
+            if parts == ["universe"]:
+                return self._json(corpus_overlays.universe(corpus))
+            if parts[:1] == ["problem"] and len(parts) == 2:
+                d = corpus_overlays.problem_detail(corpus, _decode(parts[1]))
+                return self._json(d or {"error": "unknown problem"}, 200 if d else 404)
+            if parts == ["search"]:
+                q = (query.get("q") or [""])[0]
+                return self._json(corpus.search_papers(q) if q else [])
+            return self._json({"error": "unknown corpus endpoint"}, 404)
+
     return Handler
+
+
+def _decode(s: str) -> str:
+    from urllib.parse import unquote
+    return unquote(s)
 
 
 class _DualStackServer(ThreadingHTTPServer):
@@ -119,8 +148,8 @@ class _DualStackServer(ThreadingHTTPServer):
         super().server_bind()
 
 
-def serve(store: Store, host: str = "::", port: int = 8765):
+def serve(store: Store, corpus=None, host: str = "::", port: int = 8765):
     try:
-        return _DualStackServer((host, port), make_handler(store))
+        return _DualStackServer((host, port), make_handler(store, corpus))
     except OSError:
-        return ThreadingHTTPServer(("0.0.0.0", port), make_handler(store))
+        return ThreadingHTTPServer(("0.0.0.0", port), make_handler(store, corpus))

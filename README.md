@@ -1,96 +1,105 @@
-# Knowledge OS — MVP (proof-of-atom)
+# Knowledge OS — CS Knowledge Operating System (v1)
 
-**The first problem-centric knowledge operating system.** Instead of searching papers, you
-navigate **Problems → Claims → Evidence → Open Questions**. This is the working MVP that proves
-the core idea on two real research lineages.
+**Navigate problems, not papers.** Knowledge OS ingests the real research corpus and organizes it
+the way the original plan specified — around **problems**, their **evolution**, their
+**breakthroughs**, the **people**, and how problems **connect** — starting with computer science.
+Other domains plug into the same engine later.
 
-> Mission unchanged from day one: organize knowledge around problems, attempts, evidence,
-> breakthroughs, and open questions. What changed is *how* — see `schema/knowledge-model-v0.1.md`
-> for the model we validated before building, and `plans/…` for the founding-team strategy memo.
+This is the original-plan architecture (Layers 0–4) running on **real data**, not mock-ups.
 
 ---
 
 ## Run it (one command, no setup)
 
-You need Python 3 (already installed on this machine). Then:
+Python 3 is already installed. Then:
 
 ```
 python run.py
 ```
 
-It builds the knowledge base, starts a local server, and opens your browser at
-**http://localhost:8765**. Press `Ctrl+C` to stop. No database to install, no internet needed.
+Builds the knowledge base, starts a local server, opens your browser at **http://localhost:8765**.
+No database server, no internet needed at run time (the corpus is pre-ingested into `corpus.db`).
+
+If `corpus.db` is missing, ingest a fresh real corpus first (needs internet):
+
+```
+python -m knowledge_os.ingest --works-per-topic 200 --max-topics 24
+```
+
+That pulls real papers from **OpenAlex** (free, ~250M works) across 24 canonical computing
+problems. It is **resumable** — re-run with more topics/works to grow toward the 500k target;
+already-ingested problems are skipped.
 
 ---
 
-## What to click
+## What you can do
 
-Two problems are loaded in the left sidebar:
+The front page is the **CS corpus** (currently 4,800 real papers, 24 problems, ~119k citation
+edges, 9k authors):
 
-1. **Distributed Consensus** (engineering computer science)
-2. **Amyloid Cascade Hypothesis** (contested biomedical science)
+- **All problems** — every research problem as a card (papers, citations), grouped by subfield
+  (AI, Networks, Theory, Hardware, Information Systems, Vision).
+- **A problem page** (click any card) — all *computed* from real papers:
+  - **Evolution** — papers-per-year bar chart (the field's growth curve)
+  - **Breakthroughs** — most-cited works
+  - **Active frontier** — recent high-impact work
+  - **Key authors** — by citation weight
+  - **Draws on** — the other problems this one cites most (real citation flow)
+- **Universe map** — every problem as a node, citation flow between them as edges. This is the
+  original plan's Layer 4 (cross-disciplinary graph) in miniature, scoped to CS; the *same* view
+  will later connect other domains.
+- **Search** — across all 4,800 papers' titles and abstracts.
 
-For each, five views — all **computed** from the underlying claims, never hand-written:
-
-- **Map** — every claim as a node, placed by year; typed relationships as edges. Purple edges are
-  "circumvents-constraint" — watch how the whole consensus field routes around one impossibility
-  result (FLP). Click any node for its source/provenance.
-- **Timeline** — the claims in time. Notice there is **no "failure" bucket** — limits and negative
-  results are first-class evidence, not discarded attempts.
-- **Reading order** — a dependency-sorted path through the field (read this, then this).
-- **Current state** (amyloid only) — the honest answer to a contested question: a **balance of
-  evidence with named camps**, and *no verdict*. The system shows the disagreement.
-- **Trust & integrity** — the **retraction simulator**. Pick any claim, "retract" it, and watch the
-  system flag everything that leaned on it. Try the real case: the 2006 Aβ*56 paper (since
-  retracted for image manipulation) — the system flags the cascade hypothesis it propped up.
+The **curated lineage demo** (the earlier proof-of-atom with the trust/retraction features) is
+still available at **http://localhost:8765/lineages**.
 
 ---
 
-## Why this is the whole bet in miniature
+## How it maps to the original plan
 
-The hard part of this company was never the infrastructure — it was three things, and each is
-demonstrated here:
-
-| Hard problem | Where you see it |
+| Plan layer | Here |
 |---|---|
-| What is the storage atom? | **Claim**, not "problem" — verifiable, traces to a source span. Problems are computed overlays. |
-| How do you earn expert trust? | Every claim shows provenance; **retractions propagate**; contested state renders camps, not verdicts. |
-| Does the model generalize? | Two opposite epistemologies (tidy CS, messy biomedicine) run on the *same* engine. |
-
----
-
-## How it's built (for whoever you hand this to)
-
-Zero-dependency Python standard library — deliberately, so it runs anywhere with no setup.
+| L0 Raw sources | `knowledge_os/openalex.py` — real OpenAlex ingestion (stdlib, polite pool) |
+| L1 Paper graph | `corpus.db` — papers, authors, venues, 119k citation edges |
+| L2 Problem layer | OpenAlex **topics = problems** for v1 (`ingest.py`). *Per-paper LLM problem extraction is the documented v2 upgrade.* |
+| L3 Problem evolution | `corpus_overlays.problem_detail` — timelines, breakthroughs, frontier |
+| L4 Universal graph | `corpus_overlays.universe` — cross-problem citation graph |
+| L5 Research agent | search today; Q&A over the corpus is the next build |
 
 ```
-data/            consensus.json, amyloid.json   ← the two validated lineages, as structured claims
 knowledge_os/
-  model.py       the validated knowledge model + validation rules (schema v0.1)
-  store.py       SQLite store (Postgres/pgvector is the documented scale target)
-  overlays.py    computed views: timeline, reading order, evidence ledger, retraction propagation
-  server.py      zero-dependency HTTP API + static serving
-web/             the UI (vanilla HTML/CSS/JS — no build step)
-tests/           python -m unittest discover -s tests     (9 tests, all green)
-run.py           one-command launcher
-schema/          knowledge-model-v0.1.md — the model, derived empirically from the two lineages
-proofs/          the hand-built lineage artifacts the model was stress-tested on
-plans/           the founding-team strategy memo
+  openalex.py        OpenAlex API client (stdlib only)
+  ingest.py          ingestion orchestrator + CLI (resumable, CS-scoped, curated topics)
+  corpus_store.py    SQLite store for the real corpus
+  corpus_overlays.py computed problem pages + universe graph
+  store.py / overlays.py / model.py   the curated-lineage engine (proof-of-atom + trust features)
+  server.py          zero-dependency HTTP API + static serving (corpus + lineages)
+data/                consensus.json, amyloid.json  (curated lineages)
+web/                 corpus.html/corpus.js (primary) + index.html/app.js (lineage demo)
+tests/               python -m unittest discover -s tests   (12 tests, all green)
+schema/ proofs/ plans/   the validated model, stress lineages, and strategy memo
 ```
-
-The MVP's pragmatic choices (SQLite, stdlib server, keyword search) are intentional for a
-runnable proof-of-atom. The documented scale path (FastAPI, Postgres + pgvector for semantic
-search, OpenAlex/Semantic Scholar as the corpus *lens*) is in the strategy memo and is the next
-step **after** a domain expert ratifies the two lineages — that human ratification gate, not more
-code, is what unlocks scaling.
 
 ---
 
-## Run the tests
+## v1 scope & honest data-quality notes
+
+- **CS & computing only**, by design. The engine is domain-agnostic; switching domains is changing
+  the ingest filter (`field.id`) — the original plan's later phases.
+- **Problems = OpenAlex topics** for now. This is real and automated but coarser than per-paper
+  problem extraction; that LLM step is the clear v2 upgrade and the architecture already isolates it.
+- Real-corpus artifacts you will occasionally see (and the fix path): some titles are container/
+  series names (e.g. "Lecture Notes in Computer Science 1205"), and a few publication years are
+  re-indexing oddities. v2 filters work `type` and uses cleaner title fields.
+
+## Scale path (unchanged target)
+
+SQLite + stdlib server are deliberate so v1 runs anywhere. The documented target for 500k+ works
+and semantic search is **Postgres + pgvector**, with OpenAlex/Semantic Scholar as the corpus lens.
+The ingestion is already batched and resumable for that scale.
+
+## Tests
 
 ```
 python -m unittest discover -s tests -v
 ```
-
-Covers: provenance-required, scoped edges, status lifecycle, topological reading order, and the
-trust-critical **retraction propagation**.

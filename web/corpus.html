@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Knowledge OS — CS Corpus</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1><span class="dot">◆</span> Knowledge OS</h1>
+    <span class="tag">computer science · navigate problems, not papers</span>
+    <span class="spacer"></span>
+    <input id="search" placeholder="search 4,800 papers by title or abstract…" />
+  </header>
+
+  <main>
+    <aside>
+      <div class="sec">View</div>
+      <div class="prob" id="nav-problems" onclick="showProblems()"><div class="t">All problems</div>
+        <div class="m" id="stat-mini"></div></div>
+      <div class="prob" id="nav-universe" onclick="showUniverse()"><div class="t">Universe map</div>
+        <div class="m">how CS problems cite each other</div></div>
+      <div class="sec" style="margin-top:16px">Subfields</div>
+      <div id="subfields"></div>
+      <div class="sec" style="margin-top:16px">Note</div>
+      <div style="font-size:11px;color:var(--muted);padding:0 6px;line-height:1.6">
+        Problems are <b style="color:var(--ink)">OpenAlex topics</b> (v1). Per-paper LLM problem
+        extraction is the documented next upgrade. Curated lineage demo at
+        <a href="/lineages" style="color:var(--accent)">/lineages</a>.
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="phead" id="phead"></div>
+      <div class="view" id="view"></div>
+    </section>
+  </main>
+
+  <script src="/static/corpus.js"></script>
+</body>
+</html>

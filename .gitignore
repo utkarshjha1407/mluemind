@@ -1,5 +1,9 @@
-# build artifacts
+# build artifacts (regenerable: python run.py / python -m knowledge_os.ingest)
 knowledge_os.db
+corpus.db
+corpus.db-wal
+corpus.db-shm
+corpus_test.db*
 __pycache__/
 *.pyc
 .DS_Store

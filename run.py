@@ -17,10 +17,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from knowledge_os.store import Store          # noqa: E402
-from knowledge_os.server import serve         # noqa: E402
+from knowledge_os.store import Store              # noqa: E402
+from knowledge_os.corpus_store import CorpusStore  # noqa: E402
+from knowledge_os.server import serve             # noqa: E402
 
 DB_PATH = ROOT / "knowledge_os.db"
+CORPUS_PATH = ROOT / "corpus.db"
 DATA = ROOT / "data"
 HOST, PORT = "::", 8765   # dual-stack; browser sees http://localhost:PORT
 
@@ -42,9 +44,19 @@ def build_db() -> Store:
 def main() -> None:
     print("Knowledge OS — building knowledge base...")
     store = build_db()
-    httpd = serve(store, HOST, PORT)
+    corpus = None
+    if CORPUS_PATH.exists():
+        corpus = CorpusStore(CORPUS_PATH)
+        s = corpus.stats()
+        print(f"  corpus: {s['papers']} papers across {s['problems_ingested']} CS problems "
+              f"({s['citations']} citation edges)")
+    else:
+        print("  corpus: none yet — run `python -m knowledge_os.ingest` to ingest real papers")
+    httpd = serve(store, corpus, HOST, PORT)
     url = f"http://localhost:{PORT}/"
     print(f"\n  Knowledge OS is running at  {url}")
+    if corpus:
+        print(f"  (curated lineage demo at {url}lineages)")
     print("  (press Ctrl+C to stop)\n")
     threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     try:

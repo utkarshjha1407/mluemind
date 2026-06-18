@@ -95,6 +95,42 @@ class TestStore(unittest.TestCase):
         self.assertTrue(any("Byzantine" in h["assertion"] for h in hits))
 
 
+CORPUS_DB = ROOT / "corpus.db"
+
+
+@unittest.skipUnless(CORPUS_DB.exists(), "corpus.db not present (run knowledge_os.ingest)")
+class TestCorpus(unittest.TestCase):
+    """Run only when a real ingested corpus exists; no network access here."""
+    @classmethod
+    def setUpClass(cls):
+        from knowledge_os.corpus_store import CorpusStore
+        cls.store = CorpusStore(CORPUS_DB)
+
+    def test_corpus_has_papers_and_problems(self):
+        s = self.store.stats()
+        self.assertGreater(s["papers"], 0)
+        self.assertGreater(s["problems_ingested"], 0)
+
+    def test_problem_detail_is_computed(self):
+        from knowledge_os import corpus_overlays
+        probs = self.store.problems(ingested_only=True)
+        d = corpus_overlays.problem_detail(self.store, probs[0]["id"])
+        self.assertIn("timeline", d)
+        self.assertTrue(d["milestones"])
+        # milestones are sorted by citations descending
+        cites = [m["cited_by_count"] for m in d["milestones"]]
+        self.assertEqual(cites, sorted(cites, reverse=True))
+
+    def test_universe_edges_within_nodes(self):
+        from knowledge_os import corpus_overlays
+        g = corpus_overlays.universe(self.store)
+        ids = {n["id"] for n in g["nodes"]}
+        for e in g["edges"]:
+            self.assertIn(e["src"], ids)
+            self.assertIn(e["dst"], ids)
+            self.assertNotEqual(e["src"], e["dst"])
+
+
 def _rels(data):
     # adapt seed 'from/to' to the store's 'src/dst' shape used by overlays
     return [dict(src=r["from"], dst=r["to"], kind=r["kind"],
