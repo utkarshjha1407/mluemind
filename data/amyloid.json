@@ -1,0 +1,41 @@
+{
+  "problem": {
+    "id": "P-AMYLOID",
+    "title": "Amyloid Cascade Hypothesis (Alzheimer's)",
+    "question": "Is beta-amyloid the causal driver of Alzheimer's disease?",
+    "domain": "Biomedicine / Neuroscience",
+    "epistemology": "hypothesis-driven / empirical",
+    "central_node": "A-CASCADE",
+    "central_role": "hypothesis",
+    "facets": {
+      "evidence_type": "genetic, clinical-trial, histopathological",
+      "contention": "actively contested",
+      "integrity_event": "retraction (Lesne 2006)"
+    }
+  },
+  "claims": [
+    {"id": "A-PEPTIDE", "assertion": "The beta-amyloid (Abeta) peptide is isolated and sequenced from cerebral amyloid.", "type": "empirical-result", "contribution": "measurement", "year": 1984, "source": {"paper": "Glenner & Wong 1984", "locus": "peptide sequencing"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "A-CASCADE", "assertion": "Abeta accumulation is the causal initiator of Alzheimer's pathology (tangles, neurodegeneration).", "type": "hypothesis", "contribution": "model-change", "year": 1992, "source": {"paper": "Hardy & Higgins 1992, Amyloid cascade hypothesis", "locus": "hypothesis statement"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "contested", "as_of": 2024, "positions": [{"camp": "Amyloid proponents", "stance": "Causal driver; lecanemab/donanemab vindicate that removing amyloid slows decline", "source": "van Dyck 2023; Sims 2023"}, {"camp": "Skeptics", "stance": "Modest clinical effects plus decades of trial failures suggest amyloid is a marker or partial contributor, not the sole driver", "source": "Trial failures; tau correlation"}]}},
+    {"id": "A-GENETICS", "assertion": "Mutations in APP / PSEN1 / PSEN2 cause early-onset familial Alzheimer's and raise Abeta42.", "type": "empirical-result", "contribution": "proof", "year": 1991, "source": {"paper": "Goate 1991; Sherrington 1995", "locus": "familial mutations"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "A-APOE4", "assertion": "APOE epsilon-4 is the major genetic risk factor for late-onset Alzheimer's (affects Abeta clearance).", "type": "empirical-result", "contribution": "capability", "year": 1993, "source": {"paper": "Strittmatter & Roses 1993", "locus": "APOE4 association"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "A-OLIGOMER", "assertion": "A specific soluble Abeta oligomer (Abeta*56) correlates with memory deficit in mice.", "type": "empirical-result", "contribution": "mechanism", "year": 2006, "source": {"paper": "Lesne et al. 2006, Nature", "locus": "Abeta*56 figures"}, "provenance_granularity": "pointed", "status": "retracted", "confidence": {"value": "settled", "note": "was high-confidence; retracted 2024 following image-integrity investigation (2022)"}},
+    {"id": "A-TRIALFAIL", "assertion": "Multiple anti-amyloid antibodies (bapineuzumab, solanezumab) hit the target yet show no clinical benefit.", "type": "empirical-result", "contribution": "undermining-evidence", "year": 2014, "source": {"paper": "Salloway 2014; Honig 2018", "locus": "phase 3 outcomes"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "A-TAU", "assertion": "Tau tangle pathology correlates with cognitive decline better than amyloid burden.", "type": "empirical-result", "contribution": "mechanism", "year": 1991, "source": {"paper": "Braak & Braak 1991; Bejanin 2017", "locus": "clinico-pathologic correlation"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "A-ALT", "assertion": "Non-amyloid causal hypotheses (neuroinflammation; vascular; infectious/HSV) have independent support.", "type": "survey", "contribution": "model-change", "year": 2015, "source": {"paper": "Heneka 2015; Itzhaki 1997", "locus": "alternative-hypothesis bodies of work"}, "provenance_granularity": "distributional", "status": "active", "confidence": {"value": "emerging"}},
+    {"id": "A-ADUCANUMAB", "assertion": "FDA grants accelerated approval on an amyloid-reduction biomarker amid advisory-panel resignations and unclear clinical benefit.", "type": "empirical-result", "contribution": "deployment-evidence", "year": 2021, "source": {"paper": "FDA 2021; aducanumab trials", "locus": "accelerated approval"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "contested", "positions": [{"camp": "FDA / sponsor", "stance": "Amyloid reduction is a reasonable surrogate endpoint", "source": "FDA 2021"}, {"camp": "Advisory panel", "stance": "Clinical benefit unproven; several members resigned", "source": "Panel resignations"}]}},
+    {"id": "A-LECANEMAB", "assertion": "Lecanemab removes amyloid and statistically significantly slows decline (~27%, modest absolute).", "type": "empirical-result", "contribution": "capability", "year": 2023, "source": {"paper": "van Dyck et al. 2023, CLARITY-AD", "locus": "primary endpoint"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "A-DONANEMAB", "assertion": "Donanemab independently shows comparable modest slowing with amyloid removal.", "type": "empirical-result", "contribution": "corroboration", "year": 2023, "source": {"paper": "Sims et al. 2023, TRAILBLAZER-ALZ2", "locus": "primary endpoint"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}}
+  ],
+  "relations": [
+    {"from": "A-PEPTIDE", "kind": "enables", "to": "A-CASCADE", "note": "the peptide is the precondition for the hypothesis"},
+    {"from": "A-GENETICS", "kind": "supports-hypothesis", "scope": "causal mechanism", "to": "A-CASCADE", "note": "strongest pillar — causal genetics"},
+    {"from": "A-APOE4", "kind": "complicates", "to": "A-CASCADE", "note": "clearance, not production — points partly beyond pure Abeta"},
+    {"from": "A-OLIGOMER", "kind": "supports-hypothesis", "scope": "toxic-oligomer mechanism", "to": "A-CASCADE", "note": "edge inherits RETRACTED status of its source"},
+    {"from": "A-TRIALFAIL", "kind": "undermines-hypothesis", "to": "A-CASCADE", "note": "negative evidence is first-class, not failure"},
+    {"from": "A-TAU", "kind": "competes-with", "to": "A-CASCADE", "note": "rival mechanism with better clinico-pathologic correlation"},
+    {"from": "A-ALT", "kind": "competes-with", "to": "A-CASCADE", "note": "family of rival hypotheses"},
+    {"from": "A-ADUCANUMAB", "kind": "partial-confirms", "scope": "biomarker", "to": "A-CASCADE", "note": "scoped and contested confirmation"},
+    {"from": "A-LECANEMAB", "kind": "supports-hypothesis", "scope": "qualified clinical", "to": "A-CASCADE", "note": "the partial vindication"},
+    {"from": "A-DONANEMAB", "kind": "corroborates", "to": "A-LECANEMAB", "note": "independent replication"}
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "problem": {
+    "id": "P-CONSENSUS",
+    "title": "Distributed Consensus",
+    "question": "How can distributed processes agree on a value despite failures?",
+    "domain": "Computer Science / Distributed Systems",
+    "epistemology": "engineering / formal",
+    "central_node": "C-FLP",
+    "central_role": "constraint",
+    "facets": {
+      "membership": "closed / permissioned",
+      "synchrony": "asynchronous ↔ partial",
+      "fault": "crash ↔ Byzantine",
+      "safety": "deterministic"
+    }
+  },
+  "claims": [
+    {"id": "C-CLOCKS", "assertion": "A logical-clock \"happens-before\" relation gives a partial/total order of events without synchronized time.", "type": "theorem", "contribution": "model-change", "year": 1978, "source": {"paper": "Lamport 1978, Time, Clocks, and the Ordering of Events", "locus": "happens-before definition"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-SMR", "assertion": "Any deterministic service is made fault-tolerant by replicating it as a state machine fed an agreed command log — reducing replication to consensus-on-a-log.", "type": "design-artifact", "contribution": "model-change", "year": 1978, "source": {"paper": "Lamport 1978; Schneider 1990 survey", "locus": "state-machine approach"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-BGP", "assertion": "With arbitrary (Byzantine) faults, agreement in a synchronous system requires at least 3f+1 nodes to tolerate f faulty.", "type": "theorem", "contribution": "proof", "year": 1982, "source": {"paper": "Lamport, Shostak, Pease 1982, The Byzantine Generals Problem", "locus": "3f+1 lower bound"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-FLP", "assertion": "No deterministic protocol solves consensus in an asynchronous system if even one process may crash.", "type": "theorem", "contribution": "proof", "year": 1985, "source": {"paper": "Fischer, Lynch, Paterson 1985", "locus": "impossibility theorem"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-DLS", "assertion": "Consensus IS solvable under partial synchrony (delay bounds hold eventually).", "type": "theorem", "contribution": "model-change", "year": 1988, "source": {"paper": "Dwork, Lynch, Stockmeyer 1988", "locus": "partial synchrony model"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-PAXOS-SAFE", "assertion": "A protocol guarantees agreement (safety) under full asynchrony with crash faults.", "type": "theorem", "contribution": "capability", "year": 1998, "source": {"paper": "Lamport 1998, The Part-Time Parliament", "locus": "safety proof"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-PAXOS-LIVE", "assertion": "That protocol makes progress only once a single stable leader emerges (partial synchrony) — consistent with FLP.", "type": "design-artifact", "contribution": "capability", "year": 2001, "source": {"paper": "Lamport 2001, Paxos Made Simple", "locus": "leader / progress"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-VR", "assertion": "Viewstamped Replication, derived independently, gives consensus-equivalent guarantees via primary-backup plus view change.", "type": "design-artifact", "contribution": "capability", "year": 1988, "source": {"paper": "Oki & Liskov 1988; Liskov & Cowling 2012", "locus": "VR protocol"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-ZAB", "assertion": "Atomic broadcast with a primary-order guarantee (Zab) provides the agreement substrate for a coordination service.", "type": "design-artifact", "contribution": "capability", "year": 2011, "source": {"paper": "Junqueira et al. 2011 (ZooKeeper/Zab)", "locus": "Zab protocol"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-PBFT", "assertion": "Byzantine consensus is achievable at practical performance with 3f+1 replicas under partial synchrony.", "type": "design-artifact", "contribution": "capability", "year": 1999, "source": {"paper": "Castro & Liskov 1999, Practical BFT", "locus": "PBFT protocol"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-CAP", "assertion": "Under network partition a system cannot be both linearizable and available.", "type": "theorem", "contribution": "proof", "year": 2002, "source": {"paper": "Gilbert & Lynch 2002 (proving Brewer 2000)", "locus": "CAP proof"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-CHUBBY", "assertion": "Paxos runs in production as a coarse-grained lock/coordination service at scale.", "type": "empirical-result", "contribution": "deployment-evidence", "year": 2006, "source": {"paper": "Burrows 2006, The Chubby Lock Service", "locus": "deployment report"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-SPANNER", "assertion": "Paxos plus bounded-clock uncertainty (TrueTime) yields external consistency at global scale in production.", "type": "empirical-result", "contribution": "deployment-evidence", "year": 2012, "source": {"paper": "Corbett et al. 2012, Spanner", "locus": "TrueTime + Paxos"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-RAFT", "assertion": "A consensus protocol can match Paxos safety/liveness while being substantially more understandable and implementable.", "type": "design-artifact", "contribution": "understandability", "year": 2014, "source": {"paper": "Ongaro & Ousterhout 2014", "locus": "Raft design"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-EPAXOS", "assertion": "Removing the single stable leader (leaderless, dependency-tracked commits) lowers commit latency and removes the leader bottleneck.", "type": "design-artifact", "contribution": "refines/optimizes", "year": 2013, "source": {"paper": "Moraru et al. 2013, EPaxos", "locus": "leaderless commit"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-FPAXOS", "assertion": "Quorum intersection is only required across Paxos phases, not within — enabling smaller/asymmetric quorums.", "type": "theorem", "contribution": "generalizes", "year": 2016, "source": {"paper": "Howard et al. 2016, Flexible Paxos", "locus": "quorum intersection result"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}},
+    {"id": "C-NAKAMOTO", "assertion": "Probabilistic agreement is achievable among open/permissionless membership via proof-of-work and longest-chain, under a synchrony plus honest-majority assumption.", "type": "design-artifact", "contribution": "model-change", "year": 2008, "source": {"paper": "Nakamoto 2008, Bitcoin", "locus": "longest-chain rule"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "contested", "positions": [{"camp": "Distributed-systems classicists", "stance": "Probabilistic, open-membership agreement is a different (sibling) problem, not classical consensus", "source": "BFT literature"}, {"camp": "Blockchain researchers", "stance": "It is consensus under relaxed assumptions and broadened the problem space", "source": "Bitcoin deployment"}]}},
+    {"id": "C-HOTSTUFF", "assertion": "BFT consensus with linear communication per view and a single responsive leader rotation enables large-scale BFT.", "type": "design-artifact", "contribution": "refines/optimizes", "year": 2019, "source": {"paper": "Yin et al. 2019, HotStuff", "locus": "linear view change"}, "provenance_granularity": "pointed", "status": "active", "confidence": {"value": "settled"}}
+  ],
+  "relations": [
+    {"from": "C-CLOCKS", "kind": "enables", "to": "C-SMR", "note": "ordering is the precondition for an agreed log"},
+    {"from": "C-SMR", "kind": "depends-on", "to": "C-PAXOS-SAFE", "note": "SMR reduces to consensus on the log"},
+    {"from": "C-BGP", "kind": "limits/constrains", "to": "C-PBFT", "note": "3f+1 lower bound the protocol must meet"},
+    {"from": "C-FLP", "kind": "limits/constrains", "to": "C-PAXOS-SAFE", "note": "the impossibility every crash protocol routes around"},
+    {"from": "C-DLS", "kind": "circumvents-constraint", "to": "C-FLP", "note": "escape via model change (partial synchrony)"},
+    {"from": "C-PAXOS-LIVE", "kind": "depends-on", "to": "C-DLS", "note": "liveness assumes partial synchrony"},
+    {"from": "C-PAXOS-SAFE", "kind": "circumvents-constraint", "to": "C-FLP", "note": "safety always; liveness deferred"},
+    {"from": "C-VR", "kind": "equivalent-to", "scope": "crash consensus", "to": "C-PAXOS-SAFE", "note": "independently derived; equivalence recognized later"},
+    {"from": "C-RAFT", "kind": "equivalent-to", "scope": "safety/liveness", "to": "C-PAXOS-SAFE", "note": "differs only in understandability"},
+    {"from": "C-ZAB", "kind": "equivalent-to", "scope": "atomic broadcast", "to": "C-PAXOS-SAFE", "note": "scoped equivalence"},
+    {"from": "C-PBFT", "kind": "generalizes", "to": "C-PAXOS-SAFE", "note": "crash to Byzantine fault model"},
+    {"from": "C-PBFT", "kind": "circumvents-constraint", "to": "C-FLP", "note": "partial synchrony again"},
+    {"from": "C-EPAXOS", "kind": "refines/optimizes", "to": "C-PAXOS-LIVE", "note": "removes the stable-leader bottleneck"},
+    {"from": "C-FPAXOS", "kind": "generalizes", "to": "C-PAXOS-SAFE", "note": "weakens the quorum-intersection requirement"},
+    {"from": "C-HOTSTUFF", "kind": "refines/optimizes", "to": "C-PBFT", "note": "linear communication, responsive rotation"},
+    {"from": "C-CAP", "kind": "limits/constrains", "to": "C-SMR", "note": "bounds availability of any consensus-backed service"},
+    {"from": "C-CHUBBY", "kind": "deploys", "to": "C-PAXOS-LIVE", "note": "production evidence"},
+    {"from": "C-SPANNER", "kind": "deploys", "to": "C-PAXOS-LIVE", "note": "plus a bounded-clock model"},
+    {"from": "C-NAKAMOTO", "kind": "forks-problem", "to": "C-PAXOS-SAFE", "note": "different membership + safety regime — a sibling problem"}
+  ]
+}
