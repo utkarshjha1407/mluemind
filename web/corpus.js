@@ -29,7 +29,8 @@ function setHead(title, sub) {
   $("#phead").innerHTML = `<h2>${esc(title)}</h2><div class="q">${esc(sub || "")}</div>`;
 }
 function markNav(id) {
-  ["nav-problems", "nav-universe"].forEach(n => $("#" + n).classList.toggle("active", n === id));
+  ["nav-problems", "nav-universe", "nav-landmarks"].forEach(n =>
+    $("#" + n).classList.toggle("active", n === id));
   document.querySelectorAll("#subfields .prob").forEach(e =>
     e.classList.toggle("active", e.dataset.sf === state.subfilter));
 }
@@ -225,6 +226,45 @@ function universeSvg(g) {
     svg.appendChild(t);
   });
   const wrap = document.createElement("div"); wrap.appendChild(svg); return wrap;
+}
+
+// ---------- landmarks: papers that mattered ----------
+async function showLandmarks() {
+  state.subfilter = null; markNav("nav-landmarks");
+  setHead("★ Papers that mattered",
+    "the canon that changed the course of computing — citation counts are live from OpenAlex");
+  const items = await api("/api/corpus/landmarks");
+  const v = $("#view");
+  v.innerHTML = `<p class="hint">A curated hall of fame — from Turing's machine to the Transformer.
+    Each line is a paper whose ideas redirected the field. ${items.filter(i=>i.in_corpus).length} of
+    them are also in the corpus above (click to jump to their problem).</p>`;
+  let decade = null;
+  items.forEach(it => {
+    const dec = Math.floor(it.year / 10) * 10;
+    if (dec !== decade) {
+      decade = dec;
+      v.insertAdjacentHTML("beforeend", `<div class="decade">${dec}s</div>`);
+    }
+    v.appendChild(landmarkEl(it));
+  });
+}
+function landmarkEl(it) {
+  const el = document.createElement("div"); el.className = "lm";
+  const cites = (it.cited_by_count != null)
+    ? `<span class="lmcites">${num(it.cited_by_count)} citations</span>` : "";
+  const doi = it.doi ? `<a href="${esc(it.doi)}" target="_blank" rel="noopener">paper ↗</a>` : "";
+  const inc = (it.in_corpus && it.problem_id)
+    ? `<span class="lmin" data-pid="${esc(it.problem_id)}">in corpus →</span>` : "";
+  el.innerHTML = `<div class="lmyear">${it.year}</div>
+    <div class="lmbody">
+      <div class="lmtitle">${esc(it.title)}</div>
+      <div class="lmmeta"><span class="lmauth">${esc(it.authors)}</span>
+        <span class="badge type">${esc(it.field)}</span> ${cites} ${doi} ${inc}</div>
+      <div class="lmwhy">${esc(it.why)}</div>
+    </div>`;
+  const jump = el.querySelector(".lmin");
+  if (jump) jump.onclick = () => showProblem(jump.dataset.pid);
+  return el;
 }
 
 // ---------- search ----------

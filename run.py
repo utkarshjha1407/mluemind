@@ -35,6 +35,8 @@ def build_db() -> Store:
     loaded = []
     for f in sorted(DATA.glob("*.json")):
         data = json.loads(f.read_text(encoding="utf-8"))
+        if "problem" not in data:        # skip non-lineage data files (e.g. landmarks.json)
+            continue
         store.load_lineage(data)
         loaded.append(f.stem)
     print(f"  loaded lineages: {', '.join(loaded)}")

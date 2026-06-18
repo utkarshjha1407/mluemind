@@ -68,7 +68,12 @@ edges, 25k authors):
 - **Universe map** — every problem as a node, citation flow between them as edges. This is the
   original plan's Layer 4 (cross-disciplinary graph) in miniature, scoped to CS; the *same* view
   will later connect other domains.
-- **Search** — across all 4,800 papers' titles and abstracts.
+- **★ Papers that mattered** — a curated canon of the papers that changed computing (Turing →
+  Shannon → TCP/IP → RSA → PageRank → Bitcoin → AlexNet → Attention Is All You Need → AlphaFold),
+  grouped by decade with a one-line "why it mattered," **live OpenAlex citation counts**, and a
+  jump into the corpus for the 17 that are also ingested. Build it with
+  `python -m knowledge_os.landmarks` (curated in `data/landmarks.json`).
+- **Search** — across all papers' titles and abstracts.
 
 The **curated lineage demo** (the earlier proof-of-atom with the trust/retraction features) is
 still available at **http://localhost:8765/lineages**.
@@ -90,6 +95,7 @@ still available at **http://localhost:8765/lineages**.
 knowledge_os/
   openalex.py        OpenAlex API client (stdlib only)
   ingest.py          ingestion orchestrator + CLI (resumable, CS-scoped, curated topics)
+  landmarks.py       "Papers that mattered" — curated canon + live OpenAlex enrichment
   extract_local.py   Layer 2 — OUR OWN extraction layer (TF-IDF + K-means, no API, scales)
   extract.py         Layer 2 — optional LLM polish (Anthropic backend + offline seed backend)
   corpus_store.py    SQLite store for the real corpus

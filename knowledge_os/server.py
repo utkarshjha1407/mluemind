@@ -119,6 +119,8 @@ def make_handler(store: Store, corpus=None):
                 return self._json(corpus.problems(subfield_id=sf))
             if parts == ["universe"]:
                 return self._json(corpus_overlays.universe(corpus))
+            if parts == ["landmarks"]:
+                return self._json(corpus.landmarks())
             if parts[:1] == ["problem"] and len(parts) == 2:
                 d = corpus_overlays.problem_detail(corpus, _decode(parts[1]))
                 return self._json(d or {"error": "unknown problem"}, 200 if d else 404)

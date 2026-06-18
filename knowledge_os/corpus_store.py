@@ -33,6 +33,11 @@ CREATE TABLE IF NOT EXISTS extractions (
     limitation TEXT, canonical_problem TEXT, backend TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_extr_canon ON extractions(canonical_problem);
+CREATE TABLE IF NOT EXISTS landmarks (
+    seq INTEGER PRIMARY KEY, title TEXT, authors TEXT, year INTEGER, field TEXT, why TEXT,
+    openalex_id TEXT, cited_by_count INTEGER, doi TEXT, venue TEXT, in_corpus INTEGER DEFAULT 0,
+    problem_id TEXT
+);
 """
 
 
@@ -206,6 +211,25 @@ class CorpusStore:
             out.append({"name": r["name"], "n_papers": r["n_papers"], "backend": r["backend"],
                         "papers": [dict(x) for x in papers]})
         return out
+
+    # --- landmarks ("papers that mattered") ------------------------------
+    def replace_landmarks(self, rows: list[dict]):
+        self.conn.execute("DELETE FROM landmarks")
+        for i, r in enumerate(rows):
+            self.conn.execute(
+                "INSERT INTO landmarks VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                (i, r["title"], r["authors"], r["year"], r["field"], r["why"],
+                 r.get("openalex_id"), r.get("cited_by_count"), r.get("doi"),
+                 r.get("venue"), 1 if r.get("in_corpus") else 0, r.get("problem_id")))
+        self.conn.commit()
+
+    def landmarks(self) -> list[dict]:
+        rows = self.conn.execute("SELECT * FROM landmarks ORDER BY year, seq").fetchall()
+        return [dict(r) for r in rows]
+
+    def paper_problem(self, openalex_id: str) -> str | None:
+        r = self.conn.execute("SELECT problem_id FROM papers WHERE id=?", (openalex_id,)).fetchone()
+        return r[0] if r else None
 
     def extraction_stats(self) -> dict:
         c = self.conn.execute
