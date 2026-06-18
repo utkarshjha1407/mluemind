@@ -200,7 +200,7 @@ function universeSvg(g) {
     const path = document.createElementNS(SVGNS, "path");
     path.setAttribute("d", `M${a.x},${a.y} Q${cx},${cy} ${b.x},${b.y}`);
     path.setAttribute("fill", "none");
-    path.setAttribute("stroke", "#58a6ff");
+    path.style.stroke = "var(--uni-edge)";
     path.setAttribute("stroke-width", 0.4 + (e.weight / maxW) * 3.5);
     path.setAttribute("opacity", 0.18 + (e.weight / maxW) * 0.4);
     svg.appendChild(path);
@@ -210,7 +210,8 @@ function universeSvg(g) {
     const r = 5 + (n.n_papers / maxP) * 13;
     const c = document.createElementNS(SVGNS, "circle");
     c.setAttribute("cx", p.x); c.setAttribute("cy", p.y); c.setAttribute("r", r);
-    c.setAttribute("fill", "#1f6feb"); c.setAttribute("stroke", "#79c0ff"); c.setAttribute("stroke-width", 1.2);
+    c.setAttribute("stroke-width", 1.2);
+    c.style.fill = "var(--uni-node)"; c.style.stroke = "var(--uni-node-stroke)";
     c.style.cursor = "pointer";
     c.onclick = () => showProblem(n.id);
     const ttl = document.createElementNS(SVGNS, "title"); ttl.textContent = `${n.name} (${num(n.n_papers)} papers)`;
@@ -220,7 +221,7 @@ function universeSvg(g) {
     const t = document.createElementNS(SVGNS, "text");
     t.setAttribute("x", p.x + (right ? r + 4 : -(r + 4))); t.setAttribute("y", p.y + 3);
     t.setAttribute("text-anchor", right ? "start" : "end");
-    t.setAttribute("fill", "#8b98a9"); t.setAttribute("font-size", 9.5);
+    t.setAttribute("font-size", 9.5); t.style.fill = "var(--g-label)";
     t.style.cursor = "pointer"; t.onclick = () => showProblem(n.id);
     t.textContent = n.name.length > 30 ? n.name.slice(0, 29) + "…" : n.name;
     svg.appendChild(t);

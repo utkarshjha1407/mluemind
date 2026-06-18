@@ -130,10 +130,11 @@ function renderMap(v){
   svg.id = "graphSvg";
   // arrow marker
   const defs = svgEl("defs", {});
-  ["#4b5566","#bc8cff"].forEach((col,i) => {
+  ["var(--g-arrow)","var(--circumvent)"].forEach((col,i) => {
     const m = svgEl("marker", { id:`arr${i}`, markerWidth:8, markerHeight:8, refX:7, refY:3,
       orient:"auto", markerUnits:"strokeWidth" });
-    m.appendChild(svgEl("path", { d:"M0,0 L6,3 L0,6 Z", fill: col }));
+    const ap = svgEl("path", { d:"M0,0 L6,3 L0,6 Z" }); ap.style.fill = col;
+    m.appendChild(ap);
     defs.appendChild(m);
   });
   svg.appendChild(defs);
@@ -141,8 +142,9 @@ function renderMap(v){
   // year axis ticks
   for (let yr = minY; yr <= maxY; yr += Math.max(1, Math.round((maxY-minY)/8))){
     const x = xOf(yr);
-    svg.appendChild(svgEl("line", { x1:x, y1:30, x2:x, y2:H-14, stroke:"#1b2230", "stroke-width":1 }));
-    const tx = svgEl("text", { x:x, y:22, fill:"#5c6675", "font-size":10 }); tx.textContent = yr;
+    const ln = svgEl("line", { x1:x, y1:30, x2:x, y2:H-14, "stroke-width":1 }); ln.style.stroke = "var(--g-tick)";
+    svg.appendChild(ln);
+    const tx = svgEl("text", { x:x, y:22, "font-size":10 }); tx.style.fill = "var(--g-axis)"; tx.textContent = yr;
     svg.appendChild(tx);
   }
 
@@ -155,9 +157,10 @@ function renderMap(v){
     const path = svgEl("path", {
       d: `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,
       class: edgeClass(r.kind),
-      stroke: r.kind === "circumvents-constraint" ? "#bc8cff" : (STRUCT.has(r.kind) ? "#3a4658" : "#7a651f"),
       "marker-end": `url(#arr${r.kind === "circumvents-constraint" ? 1 : 0})`,
     });
+    path.style.stroke = r.kind === "circumvents-constraint" ? "var(--circumvent)"
+      : (STRUCT.has(r.kind) ? "var(--g-edge)" : "var(--g-evid-edge)");
     path.dataset.src = r.src; path.dataset.dst = r.dst;
     svg.appendChild(path);
   });
@@ -168,10 +171,10 @@ function renderMap(v){
     const g = svgEl("g", { class:"node" }); g.dataset.cid = c.id;
     const retr = c.status === "retracted";
     const cont = (c.confidence && c.confidence.value) === "contested";
-    const fill = retr ? "#2a1416" : (cont ? "#2a2410" : "#1b2330");
-    const stroke = retr ? "#f85149" : (cont ? "#d29922" : "#33415a");
-    const rect = svgEl("rect", { x:p.x, y:p.y, width:NW, height:NH, fill, stroke,
+    const rect = svgEl("rect", { x:p.x, y:p.y, width:NW, height:NH,
       "stroke-dasharray": retr ? "4 3" : "0" });
+    rect.style.fill = retr ? "var(--g-node-retr)" : (cont ? "var(--g-node-cont)" : "var(--g-node)");
+    rect.style.stroke = retr ? "var(--retracted)" : (cont ? "var(--contested)" : "var(--g-node-stroke)");
     g.appendChild(rect);
     const t1 = svgEl("text", { class:"nlabel", x:p.x+9, y:p.y+16 });
     t1.textContent = c.id.length > 15 ? c.id.slice(0,14)+"…" : c.id;
