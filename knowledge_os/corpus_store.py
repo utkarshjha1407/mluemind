@@ -160,6 +160,16 @@ class CorpusStore:
         ).fetchall()
         return [dict(r) for r in rows]
 
+    def shared_author_pairs(self, min_shared: int = 4) -> list[dict]:
+        """Problem pairs that share authors — communities that overlap in people."""
+        rows = self.conn.execute(
+            "WITH ap AS (SELECT DISTINCT pa.author_id AS aid, p.problem_id AS pid "
+            "            FROM paper_authors pa JOIN papers p ON p.id=pa.paper_id) "
+            "SELECT a.pid AS p1, b.pid AS p2, COUNT(*) AS shared "
+            "FROM ap a JOIN ap b ON a.aid=b.aid AND a.pid < b.pid "
+            "GROUP BY a.pid, b.pid HAVING shared >= ?", (min_shared,)).fetchall()
+        return [dict(r) for r in rows]
+
     def cross_problem_edges(self, min_weight: int = 3) -> list[dict]:
         """Citation flow between problems — the seed of the universal knowledge graph (Layer 4)."""
         rows = self.conn.execute(

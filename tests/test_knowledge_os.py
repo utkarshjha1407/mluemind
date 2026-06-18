@@ -144,6 +144,19 @@ class TestCorpus(unittest.TestCase):
         b = agent.answer(self.store, "what are the most active problems in CS?")
         self.assertTrue(any(blk["type"] == "ranking" for blk in b["blocks"]))
 
+    def test_ai_scientist_opportunities(self):
+        from knowledge_os import scientist
+        rep = scientist.report(self.store)
+        self.assertIn("disclaimer", rep)
+        self.assertIsInstance(rep["bridges"], list)
+        self.assertIsInstance(rep["frontiers"], list)
+        for b in rep["bridges"]:
+            self.assertNotEqual(b["p1"], b["p2"])
+            self.assertGreaterEqual(b["shared_authors"], 4)   # threshold honored
+            self.assertTrue(b["hypothesis"])
+        g = [f["growth"] for f in rep["frontiers"]]
+        self.assertEqual(g, sorted(g, reverse=True))          # frontiers ranked by momentum
+
     def test_landmarks_canon(self):
         lms = self.store.landmarks()
         if not lms:

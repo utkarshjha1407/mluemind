@@ -29,7 +29,7 @@ function setHead(title, sub) {
   $("#phead").innerHTML = `<h2>${esc(title)}</h2><div class="q">${esc(sub || "")}</div>`;
 }
 function markNav(id) {
-  ["nav-ask", "nav-problems", "nav-universe", "nav-landmarks"].forEach(n =>
+  ["nav-ask", "nav-problems", "nav-universe", "nav-landmarks", "nav-science"].forEach(n =>
     $("#" + n).classList.toggle("active", n === id));
   document.querySelectorAll("#subfields .prob").forEach(e =>
     e.classList.toggle("active", e.dataset.sf === state.subfilter));
@@ -227,6 +227,44 @@ function universeSvg(g) {
     svg.appendChild(t);
   });
   const wrap = document.createElement("div"); wrap.appendChild(svg); return wrap;
+}
+
+// ---------- AI Scientist (Layer 6: opportunities) ----------
+async function showScience() {
+  markNav("nav-science");
+  setHead("⚗ AI Scientist", "machine-suggested research opportunities — grounded in the data, unverified");
+  const r = await api("/api/corpus/opportunities");
+  const v = $("#view");
+  v.innerHTML = `<p class="hint">${mdBold(r.disclaimer)}</p>`;
+  v.insertAdjacentHTML("beforeend",
+    `<div class="section-h">Bridge opportunities — communities overlap, literatures don't</div>`);
+  v.insertAdjacentHTML("beforeend",
+    `<p class="hint" style="margin-top:-4px">Pairs where many researchers publish in both problems,
+     yet the two bodies of work barely cite each other — an under-exploited connection.</p>`);
+  (r.bridges || []).forEach(b => v.appendChild(bridgeEl(b)));
+  v.insertAdjacentHTML("beforeend", `<div class="section-h">Emerging frontiers — where momentum is</div>`);
+  (r.frontiers || []).forEach(f => v.appendChild(frontierEl(f)));
+}
+function bridgeEl(b) {
+  const el = document.createElement("div"); el.className = "bridge";
+  el.innerHTML = `
+    <div class="bridgehead">
+      <span class="bp" data-pid="${esc(b.p1)}">${esc(b.n1)}</span>
+      <span class="bx">⇄</span>
+      <span class="bp" data-pid="${esc(b.p2)}">${esc(b.n2)}</span>
+    </div>
+    <div class="bridgestat">${b.shared_authors} shared authors · ${b.citation_flow} cross-citations</div>
+    <div class="bridgehyp">${mdBold(b.hypothesis)}</div>`;
+  el.querySelectorAll(".bp").forEach(s => s.onclick = () => showProblem(s.dataset.pid));
+  return el;
+}
+function frontierEl(f) {
+  const el = document.createElement("div"); el.className = "rankrow";
+  const newest = f.newest ? `<span class="ac">newest: ${esc(f.newest.title.slice(0, 60))}…</span>` : "";
+  el.innerHTML = `<span class="rankname">${esc(f.name)}</span>
+    <span class="rankval">${Math.round(f.growth * 100)}% recent</span> ${newest}`;
+  el.onclick = () => showProblem(f.id);
+  return el;
 }
 
 // ---------- Ask the corpus (research agent) ----------

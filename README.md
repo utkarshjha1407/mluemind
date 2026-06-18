@@ -78,6 +78,11 @@ edges, 25k authors):
   "recommend reading on neural networks" — and it resolves the problem, figures out what you're
   asking, and synthesizes a cited answer from the corpus. Retrieval + templated synthesis, **no
   LLM, no API bills**.
+- **⚗ AI Scientist** (Layer 6) — machine-suggested research opportunities, grounded in the data:
+  **bridge opportunities** (problem pairs whose author communities overlap heavily but whose
+  literatures barely cite each other — under-exploited connections, with a candidate transfer
+  hypothesis) and **emerging frontiers** (fastest-growing problems). Deliberately does *not* claim
+  contradictions — that needs claim-level extraction, not citation data. No LLM, no API.
 - **Search** — across all papers' titles and abstracts.
 
 The **curated lineage demo** (the earlier proof-of-atom with the trust/retraction features) is
@@ -95,12 +100,14 @@ still available at **http://localhost:8765/lineages**.
 | L3 Problem evolution | `corpus_overlays.problem_detail` — timelines, breakthroughs, frontier |
 | L4 Universal graph | `corpus_overlays.universe` — cross-problem citation graph |
 | L5 Research agent | **"Ask the corpus"** (`agent.py`) — resolves the problem, classifies the question (evolution / current / open / authors / connections / reading / most-active), and synthesizes a cited answer from the overlays. Our own layer — no LLM, no API. |
+| L6 AI Scientist | **"AI Scientist"** (`scientist.py`) — bridge opportunities (author-overlap vs citation-flow mismatch) + emerging frontiers, each traceable to the data and labeled unverified. Contradiction detection intentionally omitted (needs claim-level extraction). No LLM, no API. |
 
 ```
 knowledge_os/
   openalex.py        OpenAlex API client (stdlib only)
   ingest.py          ingestion orchestrator + CLI (resumable, CS-scoped, curated topics)
   agent.py           Layer 5 — research agent (intent + retrieval + synthesis, no API)
+  scientist.py       Layer 6 — AI scientist (bridge opportunities + frontiers, no API)
   landmarks.py       "Papers that mattered" — curated canon + live OpenAlex enrichment
   extract_local.py   Layer 2 — OUR OWN extraction layer (TF-IDF + K-means, no API, scales)
   extract.py         Layer 2 — optional LLM polish (Anthropic backend + offline seed backend)

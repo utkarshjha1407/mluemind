@@ -80,9 +80,13 @@ def answer(store, q: str) -> dict:
     # ---- corpus-wide questions (no specific problem, or explicitly "across CS") ----
     if intent == "active" or (score == 0 and intent in ("open", "overview")):
         act = sorted(store.activity(), key=lambda a: (a["growth"], a["recent"]), reverse=True)[:10]
-        blocks = [{"type": "text",
-                   "text": "Ranked by research momentum — the share of each problem's papers "
-                           "published in the last ~6 years (higher = faster-growing)."},
+        lead = "Across the corpus, momentum is concentrated in a few areas. "
+        if len(act) >= 2:
+            lead += (f"**{act[0]['name']}** is the hottest — {round(act[0]['growth']*100)}% of its "
+                     f"papers are from the last ~6 years — followed by **{act[1]['name']}** "
+                     f"({round(act[1]['growth']*100)}%). Full ranking by recent share below "
+                     f"(a proxy for where the field is moving):")
+        blocks = [{"type": "text", "text": lead},
                   {"type": "ranking", "heading": "Fastest-growing problems in the corpus",
                    "items": [{"id": a["id"], "name": a["name"], "growth": a["growth"],
                               "recent": a["recent"], "total": a["total"]} for a in act]}]
@@ -106,12 +110,22 @@ def answer(store, q: str) -> dict:
     if intent in ("evolution", "overview"):
         tl = store.timeline(pid)
         peak = max(tl, key=lambda t: t["papers"]) if tl else None
-        narr = f"**{name}** spans {span} with {s['papers']:,} papers in the corpus"
-        if peak:
-            narr += f"; activity peaks around {peak['year']}"
-        blocks.append({"type": "text", "text": narr + "."})
-        blocks.append(_papers_block("Breakthroughs (most-cited)", store.papers_for_problem(pid, 5)))
+        ms = store.papers_for_problem(pid, 5)
         subs = store.subproblems(pid)
+        narr = (f"**{name}** is a problem the corpus tracks across {span}, with "
+                f"{s['papers']:,} papers. ")
+        if ms:
+            narr += (f"Its single most-cited landmark is “{ms[0]['title']}” "
+                     f"({ms[0]['year']}, {ms[0]['cited_by_count']:,} citations). ")
+        if peak:
+            narr += f"Output peaked around {peak['year']}. "
+        if len(subs) >= 2:
+            narr += (f"Reading the papers, the field splits into {len(subs)} sub-problems — "
+                     f"led by {subs[0]['name']} and {subs[1]['name']}. ")
+        if tl:
+            narr += "Below: the breakthroughs that anchored it, and where the work sits now."
+        blocks.append({"type": "text", "text": narr})
+        blocks.append(_papers_block("Breakthroughs (most-cited)", ms))
         if subs:
             blocks.append({"type": "problems", "heading": "Sub-problems it splits into",
                            "items": [{"id": pid, "name": sp["name"], "weight": sp["n_papers"]}
@@ -119,11 +133,16 @@ def answer(store, q: str) -> dict:
         blocks.append(_papers_block("Where it is now (recent high-impact)", store.frontier(pid, 4)))
 
     elif intent == "current":
-        blocks.append({"type": "text",
-                       "text": f"Current state of **{name}** — the most-cited recent work and the "
-                               f"sub-problems active today ({span})."})
-        blocks.append(_papers_block("Active frontier", store.frontier(pid, 6)))
+        fr = store.frontier(pid, 6)
         subs = store.subproblems(pid)
+        txt = f"As of {s.get('last_year') or 'recently'}, **{name}** is still active. "
+        if fr:
+            txt += (f"The most-cited recent paper is “{fr[0]['title']}” "
+                    f"({fr[0]['year']}, {fr[0]['cited_by_count']:,} citations). ")
+        if len(subs) >= 2:
+            txt += f"Today's work concentrates in {subs[0]['name']} and {subs[1]['name']}."
+        blocks.append({"type": "text", "text": txt})
+        blocks.append(_papers_block("Active frontier", fr))
         if subs:
             blocks.append({"type": "problems", "heading": "Active sub-problems",
                            "items": [{"id": pid, "name": sp["name"], "weight": sp["n_papers"]}
@@ -143,23 +162,35 @@ def answer(store, q: str) -> dict:
 
     elif intent == "authors":
         auth = store.key_authors(pid, 10)
-        blocks.append({"type": "text", "text": f"Most-cited authors in **{name}**:"})
+        txt = f"The researchers shaping **{name}** (ranked by citations to their work here): "
+        if len(auth) >= 3:
+            txt += (f"{auth[0]['name']} leads with {auth[0]['citations']:,} citations across "
+                    f"{auth[0]['papers']} papers, followed by {auth[1]['name']} and {auth[2]['name']}.")
+        blocks.append({"type": "text", "text": txt})
         blocks.append({"type": "authors", "heading": "Key authors",
                        "items": [{"name": a["name"], "papers": a["papers"],
                                   "citations": a["citations"]} for a in auth]})
 
     elif intent == "related":
         rel = store.related_problems(pid, 8)
-        blocks.append({"type": "text",
-                       "text": f"**{name}** draws most on these problems (by citation flow):"})
+        txt = f"By citation flow, **{name}** is most entangled with "
+        if len(rel) >= 2:
+            txt += (f"{rel[0]['name']} ({rel[0]['weight']} cross-citations) and "
+                    f"{rel[1]['name']} ({rel[1]['weight']}). These are its nearest neighbors — "
+                    f"good places to look for transferable ideas.")
+        blocks.append({"type": "text", "text": txt})
         blocks.append({"type": "problems", "heading": "Draws on",
                        "items": [{"id": r["id"], "name": r["name"], "weight": r["weight"]} for r in rel]})
 
     elif intent == "reading":
-        blocks.append({"type": "text",
-                       "text": f"A reading path for **{name}** — start with the foundational, "
-                               f"most-cited work, then the recent frontier."})
-        blocks.append(_papers_block("Start here (most-cited)", store.papers_for_problem(pid, 6)))
+        ms = store.papers_for_problem(pid, 6)
+        txt = f"To get into **{name}**, "
+        if ms:
+            txt += (f"start with “{ms[0]['title']}” ({ms[0]['year']}) — the most-cited reference "
+                    f"and the usual entry point — then work down the foundational set, and finish "
+                    f"on the recent frontier to see where it's heading.")
+        blocks.append({"type": "text", "text": txt})
+        blocks.append(_papers_block("Start here (most-cited)", ms))
         blocks.append(_papers_block("Then the frontier", store.frontier(pid, 3)))
 
     return {"question": q, "intent": intent, "interpreted": f"{intent} · {name}",

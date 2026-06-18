@@ -219,6 +219,16 @@ button.primary { background: var(--undermine); border-color: var(--undermine); c
 .spprob, .spmeth { color: var(--muted); margin-top: 4px; line-height: 1.4; }
 .spprob b, .spmeth b { color: var(--ink); }
 
+/* AI scientist — opportunities */
+.bridge { border: 1px solid var(--line); border-left: 3px solid var(--circumvent); border-radius: 10px;
+  padding: 12px 15px; margin-bottom: 10px; background: var(--panel); }
+.bridgehead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bp { font-size: 13.5px; font-weight: 600; color: var(--accent); cursor: pointer; }
+.bp:hover { text-decoration: underline; }
+.bx { color: var(--circumvent); font-size: 15px; }
+.bridgestat { font-family: var(--mono); font-size: 11px; color: var(--faint); margin: 5px 0 7px; }
+.bridgehyp { font-size: 13px; line-height: 1.5; color: var(--ink); }
+
 /* ask the corpus — research agent */
 .askbar { display: flex; gap: 10px; margin-bottom: 12px; }
 #askq { flex: 1; background: var(--panel2); border: 1px solid var(--line); color: var(--ink);
