@@ -176,3 +176,19 @@ button.primary { background: var(--undermine); border-color: var(--undermine); c
 .axis { display: flex; justify-content: space-between; color: var(--faint); font-size: 10px; margin-top: 4px; font-family: var(--mono); }
 .backlink { color: var(--accent); cursor: pointer; font-size: 12.5px; }
 .crumb { color: var(--faint); font-size: 12px; margin-bottom: 6px; }
+
+/* v2 sub-problems */
+.subproblem { border: 1px solid var(--line); border-left: 3px solid var(--circumvent); border-radius: 9px;
+  padding: 4px 14px; margin-bottom: 8px; background: var(--panel); }
+.subproblem summary { cursor: pointer; padding: 8px 0; display: flex; justify-content: space-between;
+  align-items: center; list-style: none; }
+.subproblem summary::-webkit-details-marker { display: none; }
+.subproblem summary::before { content: "▸"; color: var(--circumvent); margin-right: 8px; }
+.subproblem[open] summary::before { content: "▾"; }
+.spname { font-size: 13.5px; font-weight: 600; }
+.spcount { font-size: 11px; color: var(--circumvent); font-family: var(--mono); }
+.sppaper { padding: 9px 0 9px 22px; border-top: 1px solid var(--line); font-size: 12px; }
+.sptitle { font-weight: 600; line-height: 1.35; }
+.spyr { color: var(--faint); font-family: var(--mono); font-weight: 400; font-size: 11px; }
+.spprob, .spmeth { color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.spprob b, .spmeth b { color: var(--ink); }

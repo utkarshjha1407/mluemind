@@ -62,6 +62,18 @@ CURATED_TOPIC_IDS = [
     "T10679",  # Service-Oriented Architecture and Web Services
     "T10904",  # Embedded Systems Design Techniques
     "T10531",  # Advanced Vision and Imaging
+    "T10470",  # Usability and User Interface Design (HCI)
+    "T10481",  # Computer Graphics and Visualization Techniques
+    "T10201",  # Speech Recognition and Synthesis
+    "T10682",  # Quantum Computing Algorithms and Architecture
+    "T10080",  # Energy Efficient Wireless Sensor Networks
+    "T10764",  # Privacy-Preserving Technologies in Data (federated/privacy)
+    "T11032",  # VLSI and Analog Circuit Testing
+    "T12326",  # Network Packet Processing and Optimization
+    "T10627",  # Advanced Image and Video Retrieval Techniques
+    "T10586",  # Robotic Path Planning Algorithms
+    "T10799",  # Data Visualization and Analytics
+    "T10688",  # Image and Signal Denoising Methods
 ]
 
 

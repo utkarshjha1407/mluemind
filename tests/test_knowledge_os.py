@@ -130,6 +130,18 @@ class TestCorpus(unittest.TestCase):
             self.assertIn(e["dst"], ids)
             self.assertNotEqual(e["src"], e["dst"])
 
+    def test_v2_extraction_groups_into_subproblems(self):
+        # only if some papers have been extracted (python -m knowledge_os.extract)
+        if self.store.extraction_stats()["extracted"] == 0:
+            self.skipTest("no extractions present")
+        # find a problem that has extractions and assert it yields >1 canonical sub-problem
+        row = self.store.conn.execute(
+            "SELECT p.problem_id FROM extractions e JOIN papers p ON p.id=e.paper_id "
+            "GROUP BY p.problem_id ORDER BY COUNT(*) DESC LIMIT 1").fetchone()
+        subs = self.store.subproblems(row[0])
+        self.assertTrue(subs)
+        self.assertTrue(all(s["papers"] for s in subs))  # every sub-problem lists its papers
+
 
 def _rels(data):
     # adapt seed 'from/to' to the store's 'src/dst' shape used by overlays

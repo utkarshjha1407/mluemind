@@ -20,6 +20,7 @@ def problem_detail(store: CorpusStore, pid: str) -> dict | None:
         "frontier": store.frontier(pid, limit=8),                # recent high-impact = active edge
         "key_authors": store.key_authors(pid, limit=10),
         "related": store.related_problems(pid, limit=8),
+        "subproblems": store.subproblems(pid),                   # v2: read-the-paper extraction
     }
 
 

@@ -26,16 +26,27 @@ If `corpus.db` is missing, ingest a fresh real corpus first (needs internet):
 python -m knowledge_os.ingest --works-per-topic 200 --max-topics 24
 ```
 
-That pulls real papers from **OpenAlex** (free, ~250M works) across 24 canonical computing
+That pulls real papers from **OpenAlex** (free, ~250M works) across the curated computing
 problems. It is **resumable** — re-run with more topics/works to grow toward the 500k target;
-already-ingested problems are skipped.
+already-ingested problems are skipped. (The shipped corpus is 36 problems × 400 papers.)
+
+Optional **v2 problem extraction** (Layer 2 — read each paper, don't just use its topic label):
+
+```
+python -m knowledge_os.extract --problem T10270 --limit 30   # one topic
+python -m knowledge_os.extract --limit 500                   # across the corpus
+```
+
+With `ANTHROPIC_API_KEY` set this runs real LLM extraction (`claude-opus-4-8`); without a key it
+replays the bundled sample extractions in `data/extractions/`. Output appears on each problem page
+as **"Sub-problems found by reading the papers."**
 
 ---
 
 ## What you can do
 
-The front page is the **CS corpus** (currently 4,800 real papers, 24 problems, ~119k citation
-edges, 9k authors):
+The front page is the **CS corpus** (currently 14,400 real papers, 36 problems, ~379k citation
+edges, 25k authors):
 
 - **All problems** — every research problem as a card (papers, citations), grouped by subfield
   (AI, Networks, Theory, Hardware, Information Systems, Vision).
@@ -61,7 +72,7 @@ still available at **http://localhost:8765/lineages**.
 |---|---|
 | L0 Raw sources | `knowledge_os/openalex.py` — real OpenAlex ingestion (stdlib, polite pool) |
 | L1 Paper graph | `corpus.db` — papers, authors, venues, 119k citation edges |
-| L2 Problem layer | OpenAlex **topics = problems** for v1 (`ingest.py`). *Per-paper LLM problem extraction is the documented v2 upgrade.* |
+| L2 Problem layer | v1: OpenAlex **topics = problems** (`ingest.py`). **v2: per-paper LLM extraction** (`extract.py`) → finer-grained sub-problems, shown on each problem page. |
 | L3 Problem evolution | `corpus_overlays.problem_detail` — timelines, breakthroughs, frontier |
 | L4 Universal graph | `corpus_overlays.universe` — cross-problem citation graph |
 | L5 Research agent | search today; Q&A over the corpus is the next build |
@@ -70,6 +81,7 @@ still available at **http://localhost:8765/lineages**.
 knowledge_os/
   openalex.py        OpenAlex API client (stdlib only)
   ingest.py          ingestion orchestrator + CLI (resumable, CS-scoped, curated topics)
+  extract.py         Layer 2 problem extraction (Anthropic backend + offline seed backend)
   corpus_store.py    SQLite store for the real corpus
   corpus_overlays.py computed problem pages + universe graph
   store.py / overlays.py / model.py   the curated-lineage engine (proof-of-atom + trust features)

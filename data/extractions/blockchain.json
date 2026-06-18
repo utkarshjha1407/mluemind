@@ -1,0 +1,101 @@
+{
+  "_note": "v2 problem-extraction seed. Produced by reading each paper's title+abstract (the LLM step ingest automates at scale when ANTHROPIC_API_KEY is set). Keyed by OpenAlex work id.",
+  "https://openalex.org/W3151748982": {
+    "problem": "Bitcoin's ledger is single-purpose; there is no general-purpose decentralized computer for arbitrary applications.",
+    "method": "A Turing-complete, account-based stateful transaction machine (the EVM) with gas-metered execution.",
+    "contribution": "Generalized the blockchain from a currency ledger to a programmable smart-contract platform.",
+    "limitation": "Gas economics, throughput, and the security of arbitrary contract code.",
+    "canonical_problem": "Programmable smart-contract platforms"
+  },
+  "https://openalex.org/W1969344535": {
+    "problem": "How to formalize and enforce contractual relationships over untrusted public networks.",
+    "method": "Derives design objectives for smart contracts from legal, economic, and security principles.",
+    "contribution": "Foundational definition of the smart contract.",
+    "limitation": "Predates any deployable decentralized execution substrate.",
+    "canonical_problem": "Programmable smart-contract platforms"
+  },
+  "https://openalex.org/W2539190473": {
+    "problem": "Smart contracts contain exploitable bugs that cause irreversible financial loss.",
+    "method": "Documents a taxonomy of security pitfalls and tooling to detect them.",
+    "contribution": "Systematizes smart-contract vulnerability classes and detection.",
+    "limitation": "Detection is incomplete; new vulnerability classes keep emerging.",
+    "canonical_problem": "Smart-contract security & privacy"
+  },
+  "https://openalex.org/W2517744317": {
+    "problem": "On-chain smart contracts leak transactional data, violating financial privacy.",
+    "method": "Hawk: a framework compiling private contracts to cryptographic protocols (zero-knowledge).",
+    "contribution": "Privacy-preserving smart contracts without exposing on-chain inputs.",
+    "limitation": "Cryptographic overhead and reliance on a minimally-trusted manager.",
+    "canonical_problem": "Smart-contract security & privacy"
+  },
+  "https://openalex.org/W2392113277": {
+    "problem": "IoT devices need trustless coordination without a central intermediary.",
+    "method": "Analysis of blockchain suitability for IoT, with optimizations and open challenges.",
+    "contribution": "Maps blockchain capabilities onto IoT requirements.",
+    "limitation": "Throughput, latency, and resource constraints of IoT devices.",
+    "canonical_problem": "Blockchain for IoT integration"
+  },
+  "https://openalex.org/W2803371618": {
+    "problem": "Integrating blockchain with IoT raises unresolved security and reliability issues.",
+    "method": "Survey of blockchain-IoT integration challenges and opportunities.",
+    "contribution": "Catalogs integration challenges, especially data reliability/security.",
+    "limitation": "Survey; no new mechanism or evaluation.",
+    "canonical_problem": "Blockchain for IoT integration"
+  },
+  "https://openalex.org/W2898069736": {
+    "problem": "Global supply chains lack transparency, traceability, and security.",
+    "method": "Conceptual analysis of blockchain + smart contracts for supply-chain management.",
+    "contribution": "Framework linking blockchain to sustainable supply-chain management.",
+    "limitation": "Conceptual; adoption and integration barriers untested.",
+    "canonical_problem": "Blockchain for supply-chain & domain applications"
+  },
+  "https://openalex.org/W2899357412": {
+    "problem": "The energy sector lacks a structured view of where blockchain can help.",
+    "method": "Systematic review of blockchain use cases in the energy sector.",
+    "contribution": "Maps challenges and opportunities for blockchain in energy.",
+    "limitation": "Review; opportunities largely unvalidated in production.",
+    "canonical_problem": "Blockchain for supply-chain & domain applications"
+  },
+  "https://openalex.org/W2522448907": {
+    "problem": "Electronic medical records are siloed and patients lack control over access.",
+    "method": "MedRec: blockchain-based access-control and permission management for EMRs.",
+    "contribution": "Decentralized, auditable medical-data access management.",
+    "limitation": "Scalability and integration with existing health IT.",
+    "canonical_problem": "Blockchain for healthcare data"
+  },
+  "https://openalex.org/W2754529701": {
+    "problem": "The field lacks a consolidated view of blockchain architecture and consensus.",
+    "method": "Survey of blockchain architecture and comparison of consensus algorithms.",
+    "contribution": "Taxonomy of architecture + consensus with future trends.",
+    "limitation": "Survey; no new mechanism.",
+    "canonical_problem": "Blockchain surveys & taxonomies"
+  },
+  "https://openalex.org/W2897450989": {
+    "problem": "Blockchain's benefits and challenges are scattered across many domains.",
+    "method": "Survey of benefits, applications, and technical challenges.",
+    "contribution": "Consolidated catalog of blockchain benefits and challenges.",
+    "limitation": "Survey breadth over depth.",
+    "canonical_problem": "Blockchain surveys & taxonomies"
+  },
+  "https://openalex.org/W2901598045": {
+    "problem": "Blockchain-based applications lack a systematic classification.",
+    "method": "Systematic literature review across application domains.",
+    "contribution": "Classification of blockchain applications and open issues.",
+    "limitation": "Snapshot in time; fast-moving field.",
+    "canonical_problem": "Blockchain surveys & taxonomies"
+  },
+  "https://openalex.org/W2527800909": {
+    "problem": "Unclear where current blockchain research is concentrated.",
+    "method": "Systematic review of the blockchain research literature.",
+    "contribution": "Maps the state and focus areas of blockchain research.",
+    "limitation": "Review; rapidly outdated.",
+    "canonical_problem": "Blockchain surveys & taxonomies"
+  },
+  "https://openalex.org/W893234787": {
+    "problem": "Blockchain's significance beyond currency is poorly understood.",
+    "method": "Book-length conceptual exposition (Blockchain 1.0/2.0/3.0).",
+    "contribution": "Vision and taxonomy of blockchain as a computing paradigm.",
+    "limitation": "Speculative; little empirical grounding.",
+    "canonical_problem": "Blockchain surveys & taxonomies"
+  }
+}

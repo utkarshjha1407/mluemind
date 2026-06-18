@@ -76,6 +76,18 @@ async function showProblem(pid) {
     <div class="s"><b>${s.first_year || "—"}–${s.last_year || "—"}</b><span>active span</span></div>
   </div>`);
 
+  // v2: sub-problems extracted by reading papers
+  if (d.subproblems && d.subproblems.length) {
+    v.insertAdjacentHTML("beforeend",
+      `<div class="section-h">Sub-problems found by reading the papers
+        <span style="color:var(--circumvent);font-weight:600"> · v2 extraction</span></div>`);
+    v.insertAdjacentHTML("beforeend",
+      `<p class="hint" style="margin-top:-4px">An LLM read each paper's abstract and named the
+       <b>specific problem</b> it solves — finer-grained than the topic label. ${d.subproblems.length}
+       distinct sub-problems emerged. Click to expand.</p>`);
+    d.subproblems.forEach(sp => v.appendChild(subproblemEl(sp)));
+  }
+
   // timeline bar chart
   v.insertAdjacentHTML("beforeend", `<div class="section-h">Evolution — papers per year</div>`);
   v.appendChild(timelineBars(d.timeline));
@@ -116,6 +128,22 @@ function paperEl(p) {
   return el;
 }
 function emptyEl(t){ const e=document.createElement("div"); e.className="empty"; e.textContent=t; return e; }
+
+function subproblemEl(sp) {
+  const wrap = document.createElement("details"); wrap.className = "subproblem";
+  const sum = document.createElement("summary");
+  sum.innerHTML = `<span class="spname">${esc(sp.name)}</span>
+    <span class="spcount">${sp.n_papers} paper${sp.n_papers > 1 ? "s" : ""}</span>`;
+  wrap.appendChild(sum);
+  sp.papers.forEach(p => {
+    const el = document.createElement("div"); el.className = "sppaper";
+    el.innerHTML = `<div class="sptitle">${esc(p.title)} <span class="spyr">${p.year}</span></div>
+      <div class="spprob"><b>Problem:</b> ${esc(p.problem)}</div>
+      <div class="spmeth"><b>Method:</b> ${esc(p.method)}</div>`;
+    wrap.appendChild(el);
+  });
+  return wrap;
+}
 
 function timelineBars(tl) {
   const wrap = document.createElement("div");

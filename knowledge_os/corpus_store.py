@@ -28,6 +28,11 @@ CREATE INDEX IF NOT EXISTS idx_problems_subfield ON problems(subfield_id);
 CREATE INDEX IF NOT EXISTS idx_cit_dst ON citations(dst);
 CREATE INDEX IF NOT EXISTS idx_cit_src ON citations(src);
 CREATE INDEX IF NOT EXISTS idx_pa_author ON paper_authors(author_id);
+CREATE TABLE IF NOT EXISTS extractions (
+    paper_id TEXT PRIMARY KEY, problem TEXT, method TEXT, contribution TEXT,
+    limitation TEXT, canonical_problem TEXT, backend TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_extr_canon ON extractions(canonical_problem);
 """
 
 
@@ -159,6 +164,53 @@ class CorpusStore:
             "GROUP BY p1.problem_id, p2.problem_id HAVING weight>=?", (min_weight,)
         ).fetchall()
         return [dict(r) for r in rows]
+
+    # --- v2 problem extraction -------------------------------------------
+    def papers_with_abstracts(self, pid: str | None, limit: int, only_unextracted=True) -> list[dict]:
+        q = ("SELECT p.* FROM papers p WHERE length(p.abstract)>200 "
+             "AND p.title NOT LIKE 'Lecture Notes%'")
+        args: list = []
+        if pid:
+            q += " AND p.problem_id=?"
+            args.append(pid)
+        if only_unextracted:
+            q += " AND p.id NOT IN (SELECT paper_id FROM extractions)"
+        q += " ORDER BY p.cited_by_count DESC LIMIT ?"
+        args.append(limit)
+        return [dict(r) for r in self.conn.execute(q, args).fetchall()]
+
+    def add_extraction(self, paper_id: str, e: dict, backend: str):
+        self.conn.execute(
+            "INSERT OR REPLACE INTO extractions VALUES (?,?,?,?,?,?,?)",
+            (paper_id, e.get("problem"), e.get("method"), e.get("contribution"),
+             e.get("limitation"), e.get("canonical_problem"), backend))
+
+    def extraction(self, paper_id: str) -> dict | None:
+        r = self.conn.execute("SELECT * FROM extractions WHERE paper_id=?", (paper_id,)).fetchone()
+        return dict(r) if r else None
+
+    def subproblems(self, pid: str) -> list[dict]:
+        """v2 sub-problems: canonical problems discovered by reading the papers in this topic."""
+        rows = self.conn.execute(
+            "SELECT e.canonical_problem AS name, COUNT(*) AS n_papers "
+            "FROM extractions e JOIN papers p ON p.id=e.paper_id "
+            "WHERE p.problem_id=? GROUP BY e.canonical_problem ORDER BY n_papers DESC", (pid,)
+        ).fetchall()
+        out = []
+        for r in rows:
+            papers = self.conn.execute(
+                "SELECT p.id, p.title, p.year, p.cited_by_count, e.problem, e.method, e.contribution "
+                "FROM extractions e JOIN papers p ON p.id=e.paper_id "
+                "WHERE p.problem_id=? AND e.canonical_problem=? ORDER BY p.cited_by_count DESC",
+                (pid, r["name"])).fetchall()
+            out.append({"name": r["name"], "n_papers": r["n_papers"],
+                        "papers": [dict(x) for x in papers]})
+        return out
+
+    def extraction_stats(self) -> dict:
+        c = self.conn.execute
+        return {"extracted": c("SELECT COUNT(*) FROM extractions").fetchone()[0],
+                "canonical_problems": c("SELECT COUNT(DISTINCT canonical_problem) FROM extractions").fetchone()[0]}
 
     def problem_summary(self, pid: str) -> dict:
         r = self.conn.execute(
