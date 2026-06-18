@@ -192,7 +192,7 @@ class CorpusStore:
     def subproblems(self, pid: str) -> list[dict]:
         """v2 sub-problems: canonical problems discovered by reading the papers in this topic."""
         rows = self.conn.execute(
-            "SELECT e.canonical_problem AS name, COUNT(*) AS n_papers "
+            "SELECT e.canonical_problem AS name, COUNT(*) AS n_papers, MIN(e.backend) AS backend "
             "FROM extractions e JOIN papers p ON p.id=e.paper_id "
             "WHERE p.problem_id=? GROUP BY e.canonical_problem ORDER BY n_papers DESC", (pid,)
         ).fetchall()
@@ -203,7 +203,7 @@ class CorpusStore:
                 "FROM extractions e JOIN papers p ON p.id=e.paper_id "
                 "WHERE p.problem_id=? AND e.canonical_problem=? ORDER BY p.cited_by_count DESC",
                 (pid, r["name"])).fetchall()
-            out.append({"name": r["name"], "n_papers": r["n_papers"],
+            out.append({"name": r["name"], "n_papers": r["n_papers"], "backend": r["backend"],
                         "papers": [dict(x) for x in papers]})
         return out
 

@@ -78,13 +78,17 @@ async function showProblem(pid) {
 
   // v2: sub-problems extracted by reading papers
   if (d.subproblems && d.subproblems.length) {
+    const isLLM = d.subproblems.some(sp => sp.backend && sp.backend !== "local");
+    const how = isLLM
+      ? `An LLM read each paper and named the <b>specific problem</b> it solves.`
+      : `Our own extraction layer (TF-IDF + clustering, no API) grouped these papers by the
+         <b>specific problem</b> they solve — finer-grained than the topic label.`;
     v.insertAdjacentHTML("beforeend",
       `<div class="section-h">Sub-problems found by reading the papers
-        <span style="color:var(--circumvent);font-weight:600"> · v2 extraction</span></div>`);
+        <span style="color:var(--circumvent);font-weight:600"> · v2</span></div>`);
     v.insertAdjacentHTML("beforeend",
-      `<p class="hint" style="margin-top:-4px">An LLM read each paper's abstract and named the
-       <b>specific problem</b> it solves — finer-grained than the topic label. ${d.subproblems.length}
-       distinct sub-problems emerged. Click to expand.</p>`);
+      `<p class="hint" style="margin-top:-4px">${how} ${d.subproblems.length} distinct sub-problems
+       emerged. Click to expand.</p>`);
     d.subproblems.forEach(sp => v.appendChild(subproblemEl(sp)));
   }
 
@@ -132,7 +136,9 @@ function emptyEl(t){ const e=document.createElement("div"); e.className="empty";
 function subproblemEl(sp) {
   const wrap = document.createElement("details"); wrap.className = "subproblem";
   const sum = document.createElement("summary");
-  sum.innerHTML = `<span class="spname">${esc(sp.name)}</span>
+  const tag = (sp.backend && sp.backend !== "local")
+    ? `<span class="sptag llm">llm</span>` : `<span class="sptag local">local</span>`;
+  sum.innerHTML = `<span class="spname">${esc(sp.name)} ${tag}</span>
     <span class="spcount">${sp.n_papers} paper${sp.n_papers > 1 ? "s" : ""}</span>`;
   wrap.appendChild(sum);
   sp.papers.forEach(p => {

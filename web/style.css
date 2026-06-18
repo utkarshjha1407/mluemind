@@ -186,6 +186,9 @@ button.primary { background: var(--undermine); border-color: var(--undermine); c
 .subproblem summary::before { content: "▸"; color: var(--circumvent); margin-right: 8px; }
 .subproblem[open] summary::before { content: "▾"; }
 .spname { font-size: 13.5px; font-weight: 600; }
+.sptag { font-size: 9px; font-family: var(--mono); padding: 1px 6px; border-radius: 10px; vertical-align: middle; margin-left: 4px; }
+.sptag.local { color: var(--accent2); border: 1px solid #244; }
+.sptag.llm { color: var(--circumvent); border: 1px solid #3a2c4a; }
 .spcount { font-size: 11px; color: var(--circumvent); font-family: var(--mono); }
 .sppaper { padding: 9px 0 9px 22px; border-top: 1px solid var(--line); font-size: 12px; }
 .sptitle { font-weight: 600; line-height: 1.35; }
