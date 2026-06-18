@@ -130,6 +130,20 @@ class TestCorpus(unittest.TestCase):
             self.assertIn(e["dst"], ids)
             self.assertNotEqual(e["src"], e["dst"])
 
+    def test_research_agent(self):
+        from knowledge_os import agent
+        # intent classification
+        self.assertEqual(agent.classify("how did X evolve?"), "evolution")
+        self.assertEqual(agent.classify("most active problems in CS"), "active")
+        self.assertEqual(agent.classify("who works on X"), "authors")
+        # a problem-specific question returns a matched problem + non-empty blocks
+        a = agent.answer(self.store, "how did databases evolve?")
+        self.assertIsNotNone(a["problem"])
+        self.assertTrue(a["blocks"])
+        # the corpus-wide active question returns a ranking block
+        b = agent.answer(self.store, "what are the most active problems in CS?")
+        self.assertTrue(any(blk["type"] == "ranking" for blk in b["blocks"]))
+
     def test_landmarks_canon(self):
         lms = self.store.landmarks()
         if not lms:

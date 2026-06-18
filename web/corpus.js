@@ -29,7 +29,7 @@ function setHead(title, sub) {
   $("#phead").innerHTML = `<h2>${esc(title)}</h2><div class="q">${esc(sub || "")}</div>`;
 }
 function markNav(id) {
-  ["nav-problems", "nav-universe", "nav-landmarks"].forEach(n =>
+  ["nav-ask", "nav-problems", "nav-universe", "nav-landmarks"].forEach(n =>
     $("#" + n).classList.toggle("active", n === id));
   document.querySelectorAll("#subfields .prob").forEach(e =>
     e.classList.toggle("active", e.dataset.sf === state.subfilter));
@@ -227,6 +227,92 @@ function universeSvg(g) {
     svg.appendChild(t);
   });
   const wrap = document.createElement("div"); wrap.appendChild(svg); return wrap;
+}
+
+// ---------- Ask the corpus (research agent) ----------
+const SUGGESTIONS = [
+  "How did distributed systems evolve?",
+  "What are the most active problems in CS?",
+  "Open directions in cryptography",
+  "Who works on natural language processing?",
+  "What does cloud computing draw on?",
+  "Recommend reading on neural networks",
+];
+function showAsk(prefill) {
+  markNav("nav-ask");
+  setHead("⌕ Ask the corpus", "a research agent over 14,400 papers — retrieval + synthesis, no API");
+  const v = $("#view");
+  v.innerHTML = `
+    <div class="askbar">
+      <input id="askq" placeholder="ask anything: how did X evolve, who works on X, what's most active…" />
+      <button class="primary" onclick="runAsk()">Ask →</button>
+    </div>
+    <div class="suggest" id="suggest"></div>
+    <div id="answer"></div>`;
+  const sg = $("#suggest");
+  SUGGESTIONS.forEach(s => {
+    const c = document.createElement("span"); c.className = "chip"; c.textContent = s;
+    c.onclick = () => { $("#askq").value = s; runAsk(); };
+    sg.appendChild(c);
+  });
+  const inp = $("#askq");
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") runAsk(); });
+  if (prefill) { inp.value = prefill; runAsk(); } else inp.focus();
+}
+async function runAsk() {
+  const q = $("#askq").value.trim();
+  if (!q) return;
+  const out = $("#answer");
+  out.innerHTML = `<p class="hint">Thinking over the corpus…</p>`;
+  const a = await api(`/api/corpus/ask?q=${enc(q)}`);
+  renderAnswer(a, out);
+}
+function mdBold(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
+function renderAnswer(a, out) {
+  out.innerHTML = "";
+  if (a.interpreted)
+    out.insertAdjacentHTML("beforeend",
+      `<div class="ansinterp">interpreted as: <b>${esc(a.interpreted)}</b></div>`);
+  (a.blocks || []).forEach(b => {
+    if (b.type === "text") {
+      out.insertAdjacentHTML("beforeend", `<p class="anstext">${mdBold(b.text)}</p>`);
+    } else if (b.type === "papers") {
+      out.insertAdjacentHTML("beforeend", `<div class="section-h">${esc(b.heading)}</div>`);
+      b.items.forEach(p => {
+        const el = paperEl(p);
+        if (p.problem_id) { el.style.cursor = "pointer"; el.onclick = () => showProblem(p.problem_id); }
+        out.appendChild(el);
+      });
+    } else if (b.type === "problems") {
+      out.insertAdjacentHTML("beforeend", `<div class="section-h">${esc(b.heading)}</div>`);
+      const wrap = document.createElement("div"); wrap.className = "chips";
+      b.items.forEach(it => {
+        const c = document.createElement("div"); c.className = "chip";
+        c.innerHTML = `${esc(it.name)} <b>${it.weight}</b>`;
+        if (it.id) c.onclick = () => showProblem(it.id);
+        wrap.appendChild(c);
+      });
+      out.appendChild(wrap);
+    } else if (b.type === "ranking") {
+      out.insertAdjacentHTML("beforeend", `<div class="section-h">${esc(b.heading)}</div>`);
+      const max = Math.max(...b.items.map(i => i.growth), 0.01);
+      b.items.forEach(it => {
+        const row = document.createElement("div"); row.className = "rankrow";
+        row.innerHTML = `<span class="rankname">${esc(it.name)}</span>
+          <span class="rankbarwrap"><span class="rankbar" style="width:${(it.growth / max * 100).toFixed(0)}%"></span></span>
+          <span class="rankval">${Math.round(it.growth * 100)}% recent · ${it.total}</span>`;
+        row.onclick = () => showProblem(it.id);
+        out.appendChild(row);
+      });
+    } else if (b.type === "authors") {
+      out.insertAdjacentHTML("beforeend", `<div class="section-h">${esc(b.heading)}</div>`);
+      b.items.forEach(a2 => {
+        const el = document.createElement("div"); el.className = "authrow";
+        el.innerHTML = `<span>${esc(a2.name)}</span><span class="ac">${a2.papers} papers · ${num(a2.citations)} cites</span>`;
+        out.appendChild(el);
+      });
+    }
+  });
 }
 
 // ---------- landmarks: papers that mattered ----------

@@ -73,6 +73,11 @@ edges, 25k authors):
   grouped by decade with a one-line "why it mattered," **live OpenAlex citation counts**, and a
   jump into the corpus for the 17 that are also ingested. Build it with
   `python -m knowledge_os.landmarks` (curated in `data/landmarks.json`).
+- **⌕ Ask the corpus** — a research agent (Layer 5). Ask in plain English — "how did distributed
+  systems evolve?", "what are the most active problems in CS?", "who works on cryptography?",
+  "recommend reading on neural networks" — and it resolves the problem, figures out what you're
+  asking, and synthesizes a cited answer from the corpus. Retrieval + templated synthesis, **no
+  LLM, no API bills**.
 - **Search** — across all papers' titles and abstracts.
 
 The **curated lineage demo** (the earlier proof-of-atom with the trust/retraction features) is
@@ -89,12 +94,13 @@ still available at **http://localhost:8765/lineages**.
 | L2 Problem layer | v1: OpenAlex **topics = problems** (`ingest.py`). **v2: our own extraction layer** (`extract_local.py`, TF-IDF + clustering, no API) → ~284 sub-problems across the corpus; optional LLM polish (`extract.py`). |
 | L3 Problem evolution | `corpus_overlays.problem_detail` — timelines, breakthroughs, frontier |
 | L4 Universal graph | `corpus_overlays.universe` — cross-problem citation graph |
-| L5 Research agent | search today; Q&A over the corpus is the next build |
+| L5 Research agent | **"Ask the corpus"** (`agent.py`) — resolves the problem, classifies the question (evolution / current / open / authors / connections / reading / most-active), and synthesizes a cited answer from the overlays. Our own layer — no LLM, no API. |
 
 ```
 knowledge_os/
   openalex.py        OpenAlex API client (stdlib only)
   ingest.py          ingestion orchestrator + CLI (resumable, CS-scoped, curated topics)
+  agent.py           Layer 5 — research agent (intent + retrieval + synthesis, no API)
   landmarks.py       "Papers that mattered" — curated canon + live OpenAlex enrichment
   extract_local.py   Layer 2 — OUR OWN extraction layer (TF-IDF + K-means, no API, scales)
   extract.py         Layer 2 — optional LLM polish (Anthropic backend + offline seed backend)

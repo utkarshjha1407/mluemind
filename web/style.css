@@ -219,6 +219,22 @@ button.primary { background: var(--undermine); border-color: var(--undermine); c
 .spprob, .spmeth { color: var(--muted); margin-top: 4px; line-height: 1.4; }
 .spprob b, .spmeth b { color: var(--ink); }
 
+/* ask the corpus — research agent */
+.askbar { display: flex; gap: 10px; margin-bottom: 12px; }
+#askq { flex: 1; background: var(--panel2); border: 1px solid var(--line); color: var(--ink);
+  padding: 11px 14px; border-radius: 9px; font-size: 14px; }
+#askq:focus { outline: none; border-color: var(--accent); }
+.suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.ansinterp { font-size: 11.5px; color: var(--faint); font-family: var(--mono); margin-bottom: 12px; }
+.anstext { font-size: 14px; line-height: 1.6; color: var(--ink); margin: 6px 0 12px; }
+.rankrow { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line);
+  cursor: pointer; }
+.rankrow:hover { color: var(--accent); }
+.rankname { width: 280px; flex-shrink: 0; font-size: 13px; }
+.rankbarwrap { flex: 1; height: 8px; background: var(--panel2); border-radius: 5px; overflow: hidden; }
+.rankbar { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--bar-b)); }
+.rankval { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 130px; text-align: right; flex-shrink: 0; }
+
 /* landmarks — papers that mattered */
 .decade { font-family: var(--mono); font-size: 12px; color: var(--circumvent); letter-spacing: 1px;
   margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }

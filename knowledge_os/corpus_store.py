@@ -236,6 +236,22 @@ class CorpusStore:
         return {"extracted": c("SELECT COUNT(*) FROM extractions").fetchone()[0],
                 "canonical_problems": c("SELECT COUNT(DISTINCT canonical_problem) FROM extractions").fetchone()[0]}
 
+    def activity(self, recent_years: int = 6) -> list[dict]:
+        """Per-problem research-activity signal: recent share of papers = momentum."""
+        maxyear = self.conn.execute("SELECT MAX(year) FROM papers WHERE year>0").fetchone()[0] or 0
+        cutoff = maxyear - recent_years
+        rows = self.conn.execute(
+            "SELECT p.problem_id AS id, pr.name AS name, COUNT(*) AS total, "
+            "SUM(CASE WHEN p.year>=? THEN 1 ELSE 0 END) AS recent "
+            "FROM papers p JOIN problems pr ON pr.id=p.problem_id WHERE p.year>0 "
+            "GROUP BY p.problem_id", (cutoff,)).fetchall()
+        out = []
+        for r in rows:
+            d = dict(r)
+            d["growth"] = round(d["recent"] / d["total"], 3) if d["total"] else 0
+            out.append(d)
+        return out
+
     def problem_summary(self, pid: str) -> dict:
         r = self.conn.execute(
             "SELECT COUNT(*) AS papers, SUM(cited_by_count) AS citations, "
