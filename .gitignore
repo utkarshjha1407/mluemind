@@ -17,3 +17,5 @@ design/*.png
 
 # NOTE: app/public/data/ is intentionally committed — the static site needs it
 # to build and deploy without Python or corpus.db present.
+
+.vercel

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 440" width="1280" height="440" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <radialGradient id="glow" cx="78%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#B4502E" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#B4502E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- paper -->
+  <rect width="1280" height="440" fill="#FBFBF8"/>
+  <rect width="1280" height="440" fill="url(#glow)"/>
+  <rect x="0.5" y="0.5" width="1279" height="439" fill="none" stroke="#E6E3DA"/>
+
+  <!-- left: wordmark + taglines -->
+  <g transform="translate(84,118)">
+    <text font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="13" letter-spacing="4" fill="#6E6A62">RESEARCH OPERATING SYSTEM</text>
+    <text y="78" font-size="68" font-weight="600" letter-spacing="-2" fill="#1A1916">Knowledge OS</text>
+    <text y="138" font-size="30" fill="#1A1916">Map the <tspan font-style="italic" fill="#B4502E">evolution</tspan> of human knowledge.</text>
+    <text y="180" font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="17" fill="#6E6A62">Navigate problems, breakthroughs and open questions — not papers.</text>
+    <text y="234" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="13" fill="#9C978B">14,400 papers · 379k citations · 36 problems · live</text>
+  </g>
+
+  <!-- right: knowledge-graph motif -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M880 118 Q955 150 980 220" stroke="#B4502E" stroke-width="1.6" opacity="0.8"/>
+    <path d="M1092 138 Q1040 175 980 220" stroke="#E0DDD3" stroke-width="1.4"/>
+    <path d="M1110 252 Q1050 235 980 220" stroke="#E0DDD3" stroke-width="1.4"/>
+    <path d="M1002 322 Q990 275 980 220" stroke="#B4502E" stroke-width="1.6" stroke-dasharray="5 4" opacity="0.7"/>
+    <path d="M866 296 Q925 260 980 220" stroke="#E0DDD3" stroke-width="1.4"/>
+    <path d="M822 200 Q900 210 980 220" stroke="#E0DDD3" stroke-width="1.4"/>
+    <path d="M880 118 Q985 110 1092 138" stroke="#E0DDD3" stroke-width="1.2"/>
+  </g>
+  <g>
+    <circle cx="980" cy="220" r="11" fill="#FBFBF8" stroke="#B4502E" stroke-width="2"/>
+    <circle cx="980" cy="220" r="4.5" fill="#B4502E"/>
+    <circle cx="880" cy="118" r="6" fill="#FBFBF8" stroke="#9C978B" stroke-width="1.6"/>
+    <circle cx="1092" cy="138" r="6" fill="#FBFBF8" stroke="#9C978B" stroke-width="1.6"/>
+    <circle cx="1110" cy="252" r="6" fill="#3C6E4F"/>
+    <circle cx="1002" cy="322" r="6" fill="#FBFBF8" stroke="#B4502E" stroke-width="1.6"/>
+    <circle cx="866" cy="296" r="6" fill="#FBFBF8" stroke="#9C978B" stroke-width="1.6"/>
+    <circle cx="822" cy="200" r="5" fill="#FBFBF8" stroke="#9C978B" stroke-width="1.6"/>
+  </g>
+</svg>

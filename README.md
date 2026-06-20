@@ -1,146 +1,102 @@
-# Knowledge OS — CS Knowledge Operating System (v1)
+<div align="center">
 
-**Navigate problems, not papers.** Knowledge OS ingests the real research corpus and organizes it
-the way the original plan specified — around **problems**, their **evolution**, their
-**breakthroughs**, the **people**, and how problems **connect** — starting with computer science.
-Other domains plug into the same engine later.
+<img src="docs/banner.svg" alt="Knowledge OS" width="100%" />
 
-This is the original-plan architecture (Layers 0–4) running on **real data**, not mock-ups.
+<p>
+  <a href="https://evolve-snowy.vercel.app/"><img alt="Live demo" src="https://img.shields.io/badge/live-evolve--snowy.vercel.app-B4502E?style=flat-square" /></a>
+  <img alt="React" src="https://img.shields.io/badge/React-19-1A1916?style=flat-square&logo=react&logoColor=white" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white" />
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img alt="Runtime" src="https://img.shields.io/badge/runtime-no_API_·_%240-3C6E4F?style=flat-square" />
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-1A1916?style=flat-square" />
+</p>
 
----
+<p><b><a href="https://evolve-snowy.vercel.app/">Live demo</a></b> · <a href="#quickstart">Quickstart</a> · <a href="#how-it-works">How it works</a> · <a href="DEPLOY.md">Deploy</a></p>
 
-## Run it (one command, no setup)
-
-Python 3 is already installed. Then:
-
-```
-python run.py
-```
-
-Builds the knowledge base, starts a local server, opens your browser at **http://localhost:8765**.
-No database server, no internet needed at run time (the corpus is pre-ingested into `corpus.db`).
-
-If `corpus.db` is missing, ingest a fresh real corpus first (needs internet):
-
-```
-python -m knowledge_os.ingest --works-per-topic 200 --max-topics 24
-```
-
-That pulls real papers from **OpenAlex** (free, ~250M works) across the curated computing
-problems. It is **resumable** — re-run with more topics/works to grow toward the 500k target;
-already-ingested problems are skipped. (The shipped corpus is 36 problems × 400 papers.)
-
-**Layer 2 — problem extraction (read each paper, don't just use its topic label).** Two backends,
-both already run:
-
-```
-python -m knowledge_os.extract_local              # OUR OWN layer: TF-IDF + clustering, no API, $0
-python -m knowledge_os.extract --problem T10270   # optional LLM polish (claude-opus-4-8) if a key is set
-```
-
-- **`extract_local.py` is the primary, free, owned layer** — it embeds titles+abstracts (TF-IDF),
-  clusters each topic (K-means) to *discover* its sub-problems, labels each cluster by its most
-  distinctive terms, and pulls a problem/method sentence per paper with simple rules. No network,
-  no per-call cost. This is also the architecture that scales to millions of papers (per-paper LLM
-  calls do not). Requires numpy + scikit-learn at build time only; the app runtime stays zero-dep.
-- **`extract.py`** is an *optional* quality upgrade: real LLM extraction when `ANTHROPIC_API_KEY`
-  is set, otherwise it replays the bundled sample in `data/extractions/`. The blockchain topic ships
-  with LLM-grade samples; the other 35 use the local layer.
-
-Both write to the same `extractions` table and show up on each problem page under **"Sub-problems
-found by reading the papers,"** tagged `local` or `llm`.
+</div>
 
 ---
 
-## What you can do
+Research tools give you papers. Knowledge OS gives you the **problem** — how it evolved, what was
+tried, what failed, what won, and what's still open. You browse an actual map of a field instead of
+a list of PDFs.
 
-The front page is the **CS corpus** (currently 14,400 real papers, 36 problems, ~379k citation
-edges, 25k authors):
+It runs on real data: **14,400 papers and ~379k citations** from OpenAlex, organized into 36
+computer-science problems and the sub-problems hiding inside them. The whole thing is static and
+client-side — no backend, no database at runtime, no API keys, nothing to bill.
 
-- **All problems** — every research problem as a card (papers, citations), grouped by subfield
-  (AI, Networks, Theory, Hardware, Information Systems, Vision).
-- **A problem page** (click any card) — all *computed* from real papers:
-  - **Evolution** — papers-per-year bar chart (the field's growth curve)
-  - **Breakthroughs** — most-cited works
-  - **Active frontier** — recent high-impact work
-  - **Key authors** — by citation weight
-  - **Draws on** — the other problems this one cites most (real citation flow)
-- **Universe map** — every problem as a node, citation flow between them as edges. This is the
-  original plan's Layer 4 (cross-disciplinary graph) in miniature, scoped to CS; the *same* view
-  will later connect other domains.
-- **★ Papers that mattered** — a curated canon of the papers that changed computing (Turing →
-  Shannon → TCP/IP → RSA → PageRank → Bitcoin → AlexNet → Attention Is All You Need → AlphaFold),
-  grouped by decade with a one-line "why it mattered," **live OpenAlex citation counts**, and a
-  jump into the corpus for the 17 that are also ingested. Build it with
-  `python -m knowledge_os.landmarks` (curated in `data/landmarks.json`).
-- **⌕ Ask the corpus** — a research agent (Layer 5). Ask in plain English — "how did distributed
-  systems evolve?", "what are the most active problems in CS?", "who works on cryptography?",
-  "recommend reading on neural networks" — and it resolves the problem, figures out what you're
-  asking, and synthesizes a cited answer from the corpus. Retrieval + templated synthesis, **no
-  LLM, no API bills**.
-- **⚗ AI Scientist** (Layer 6) — machine-suggested research opportunities, grounded in the data:
-  **bridge opportunities** (problem pairs whose author communities overlap heavily but whose
-  literatures barely cite each other — under-exploited connections, with a candidate transfer
-  hypothesis) and **emerging frontiers** (fastest-growing problems). Deliberately does *not* claim
-  contradictions — that needs claim-level extraction, not citation data. No LLM, no API.
-- **Search** — across all papers' titles and abstracts.
+## Features
 
-The **curated lineage demo** (the earlier proof-of-atom with the trust/retraction features) is
-still available at **http://localhost:8765/lineages**.
+- **Problem-first navigation.** Browse fields as problems ranked by momentum, not as folders of papers.
+- **Evolution at a glance.** Per-problem timelines, breakthrough papers, the recent frontier, and key researchers — all computed from the citation graph.
+- **Ask anything (`⌘K`).** "How did distributed consensus evolve?" "Who works on cryptography?" A retrieval agent answers with cited evidence. Runs in the browser; no LLM bill.
+- **Knowledge graph.** Every problem a node, citation flow the edges. Hover to trace, click to open.
+- **AI Scientist.** Surfaces bridge opportunities (fields whose researchers overlap but whose papers don't cite each other) and emerging frontiers. It refuses to invent contradictions it can't ground.
+- **The canon.** "Papers that mattered," Turing to AlphaFold, with live citation counts.
 
----
+## Quickstart
 
-## How it maps to the original plan
-
-| Plan layer | Here |
-|---|---|
-| L0 Raw sources | `knowledge_os/openalex.py` — real OpenAlex ingestion (stdlib, polite pool) |
-| L1 Paper graph | `corpus.db` — papers, authors, venues, 119k citation edges |
-| L2 Problem layer | v1: OpenAlex **topics = problems** (`ingest.py`). **v2: our own extraction layer** (`extract_local.py`, TF-IDF + clustering, no API) → ~284 sub-problems across the corpus; optional LLM polish (`extract.py`). |
-| L3 Problem evolution | `corpus_overlays.problem_detail` — timelines, breakthroughs, frontier |
-| L4 Universal graph | `corpus_overlays.universe` — cross-problem citation graph |
-| L5 Research agent | **"Ask the corpus"** (`agent.py`) — resolves the problem, classifies the question (evolution / current / open / authors / connections / reading / most-active), and synthesizes a cited answer from the overlays. Our own layer — no LLM, no API. |
-| L6 AI Scientist | **"AI Scientist"** (`scientist.py`) — bridge opportunities (author-overlap vs citation-flow mismatch) + emerging frontiers, each traceable to the data and labeled unverified. Contradiction detection intentionally omitted (needs claim-level extraction). No LLM, no API. |
-
-```
-knowledge_os/
-  openalex.py        OpenAlex API client (stdlib only)
-  ingest.py          ingestion orchestrator + CLI (resumable, CS-scoped, curated topics)
-  agent.py           Layer 5 — research agent (intent + retrieval + synthesis, no API)
-  scientist.py       Layer 6 — AI scientist (bridge opportunities + frontiers, no API)
-  landmarks.py       "Papers that mattered" — curated canon + live OpenAlex enrichment
-  extract_local.py   Layer 2 — OUR OWN extraction layer (TF-IDF + K-means, no API, scales)
-  extract.py         Layer 2 — optional LLM polish (Anthropic backend + offline seed backend)
-  corpus_store.py    SQLite store for the real corpus
-  corpus_overlays.py computed problem pages + universe graph
-  store.py / overlays.py / model.py   the curated-lineage engine (proof-of-atom + trust features)
-  server.py          zero-dependency HTTP API + static serving (corpus + lineages)
-data/                consensus.json, amyloid.json  (curated lineages)
-web/                 corpus.html/corpus.js (primary) + index.html/app.js (lineage demo)
-tests/               python -m unittest discover -s tests   (12 tests, all green)
-schema/ proofs/ plans/   the validated model, stress lineages, and strategy memo
+```bash
+cd app
+npm install
+npm run dev          # http://localhost:5173
 ```
 
----
+That's the whole app — a static Vite + React build that reads pre-exported JSON. `npm run build`
+produces a `dist/` you can host anywhere. Deployment guide: [DEPLOY.md](DEPLOY.md).
 
-## v1 scope & honest data-quality notes
+<details>
+<summary><b>Rebuild or grow the corpus (Python, optional)</b></summary>
 
-- **CS & computing only**, by design. The engine is domain-agnostic; switching domains is changing
-  the ingest filter (`field.id`) — the original plan's later phases.
-- **Problems = OpenAlex topics** for now. This is real and automated but coarser than per-paper
-  problem extraction; that LLM step is the clear v2 upgrade and the architecture already isolates it.
-- Real-corpus artifacts you will occasionally see (and the fix path): some titles are container/
-  series names (e.g. "Lecture Notes in Computer Science 1205"), and a few publication years are
-  re-indexing oddities. v2 filters work `type` and uses cleaner title fields.
+```bash
+python -m knowledge_os.ingest         # pull real papers from OpenAlex (free, no key)
+python -m knowledge_os.extract_local  # discover sub-problems via TF-IDF + clustering
+python export_static.py               # corpus.db → app/public/data/*.json
+```
 
-## Scale path (unchanged target)
+The original zero-dependency prototype still lives at `python run.py` (→ `localhost:8765`).
+</details>
 
-SQLite + stdlib server are deliberate so v1 runs anywhere. The documented target for 500k+ works
-and semantic search is **Postgres + pgvector**, with OpenAlex/Semantic Scholar as the corpus lens.
-The ingestion is already batched and resumable for that scale.
+## How it works
 
-## Tests
+A Python engine builds the corpus; a static export turns it into JSON; a React app renders it. The
+guiding constraint throughout: **owned, free, and traceable to the data** — no paid APIs in the hot
+path, no confident hallucination.
+
+| | Layer | Implementation |
+|---|---|---|
+| **L0–L1** | Ingestion + paper graph | OpenAlex → SQLite (`knowledge_os/ingest.py`) |
+| **L2** | Problem extraction | TF-IDF + K-means sub-problems (`extract_local.py`); optional LLM path |
+| **L3–L4** | Evolution + universe graph | `corpus_overlays.py` |
+| **L5** | Research agent | intent + retrieval + synthesis, in-browser (`agent.py`) |
+| **L6** | AI Scientist | author-overlap vs. citation-flow opportunities (`scientist.py`) |
 
 ```
-python -m unittest discover -s tests -v
+app/                 React + Vite + Tailwind frontend (the deployed site)
+knowledge_os/        ingestion, extraction, overlays, agent, scientist
+export_static.py     corpus.db → static JSON the app consumes
+data/ · schema/      curated lineages + the validated knowledge model
 ```
+
+**Tech:** React · TypeScript · Vite · Tailwind · Python · SQLite · scikit-learn · OpenAlex.
+
+## Status
+
+CS-only for now; the engine is domain-agnostic, so widening it is essentially one ingest filter.
+Problems map to OpenAlex topics plus clustering (the per-paper LLM pass is built but off by default).
+OpenAlex is real-world data, so expect the occasional odd title or split citation count — surfaced,
+not hidden.
+
+## Roadmap
+
+- [x] Corpus engine (L0–L6) on real data
+- [x] Editorial web app + ⌘K research agent
+- [x] Static deploy ($0, no backend)
+- [ ] LLM-grade problem extraction across the full corpus
+- [ ] Scale toward 500k papers
+- [ ] Expand beyond computer science
+
+## License
+
+[MIT](LICENSE).
