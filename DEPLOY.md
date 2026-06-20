@@ -42,14 +42,13 @@ detected Vite settings → then `npx vercel --prod` for the production URL.
 Import the repo; `netlify.toml` sets base `app`, command `npm run build`, publish `dist`. Deploy.
 Cloudflare Pages works the same way: framework Vite, root dir `app`, output `dist`.
 
-## Option C — GitHub Pages  (no new service; uses your repo)
+## Option C — GitHub Pages  (optional; not active)
 
-Already wired: `.github/workflows/pages.yml` builds with `--base=/mluemind/` and publishes.
-1. GitHub repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Push to `main` (or run the workflow manually). 
-3. Live at `https://utkarshjha1407.github.io/mluemind/`.
-> The base-aware data fetch (`import.meta.env.BASE_URL`) makes the subpath work. If you rename the
-> repo, update `--base=/<new-name>/` in the workflow.
+Deployment runs through Vercel, so the Pages workflow was removed — an inactive Pages workflow just
+spams failed Action runs. If you ever want Pages instead: add a workflow that runs
+`npx vite build --base=/<repo>/` inside `app/` and publishes `app/dist` via `actions/deploy-pages`,
+then enable **Settings → Pages → Source: GitHub Actions**. The data fetch is already base-aware
+(`import.meta.env.BASE_URL`), so the repo-subpath URL works.
 
 ---
 
