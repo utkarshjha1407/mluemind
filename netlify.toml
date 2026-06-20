@@ -1,0 +1,10 @@
+[build]
+  base = "app"
+  command = "npm run build"
+  publish = "dist"
+
+# Hash routing means no SPA rewrite is required. Long-cache the static data.
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"

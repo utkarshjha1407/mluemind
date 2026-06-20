@@ -7,7 +7,10 @@ export function useJSON<T = unknown>(url: string | null) {
     if (!url) { setLoading(false); return; }
     let alive = true;
     setLoading(true);
-    fetch(url)
+    // base-aware: absolute "/data/..." paths resolve under the deploy base (root or subpath)
+    const base = import.meta.env.BASE_URL.replace(/\/+$/, "");
+    const full = url.startsWith("/") ? base + url : url;
+    fetch(full)
       .then((r) => r.json())
       .then((d) => { if (alive) { setData(d); setLoading(false); } })
       .catch(() => { if (alive) setLoading(false); });
