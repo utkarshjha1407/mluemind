@@ -2,6 +2,12 @@ import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "./lib/utils";
 import Explore from "./pages/Explore";
 import Problem from "./pages/Problem";
+import Ask from "./pages/Ask";
+import Scientist from "./pages/Scientist";
+import Landmarks from "./pages/Landmarks";
+import Graph from "./pages/Graph";
+import Dashboard from "./pages/Dashboard";
+import CommandPalette from "./components/CommandPalette";
 
 /* ------------------------------------------------------------------ */
 /*  Knowledge OS — editorial-research landing                          */
@@ -39,7 +45,8 @@ function Mark() {
 export function Nav() {
   const { dark, toggle } = useTheme();
   const links: [string, string][] = [
-    ["Explore", "#/explore"], ["Knowledge Graph", "#/explore"], ["Method", "#/"], ["Docs", "#/"],
+    ["Explore", "#/explore"], ["Graph", "#/graph"], ["AI Scientist", "#/scientist"],
+    ["Landmarks", "#/landmarks"], ["Dashboard", "#/dashboard"],
   ];
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
@@ -54,9 +61,9 @@ export function Nav() {
           <button onClick={toggle} className="grid h-9 w-9 place-items-center rounded-md border border-line text-[13px] text-muted hover:text-ink">
             {dark ? "☼" : "☾"}
           </button>
-          <span className="hidden items-center gap-2 rounded-md border border-line px-3 py-2 text-[12.5px] text-faint sm:flex">
+          <button onClick={() => window.dispatchEvent(new Event("kos:cmdk"))} className="hidden items-center gap-2 rounded-md border border-line px-3 py-2 text-[12.5px] text-faint hover:text-ink sm:flex">
             Search <kbd className="font-mono text-[11px]">⌘K</kbd>
-          </span>
+          </button>
           <a href="#/explore" className="rounded-md bg-ink px-3.5 py-2 text-[13px] font-medium text-paper">Open the Graph</a>
         </div>
       </div>
@@ -65,6 +72,8 @@ export function Nav() {
 }
 
 function Hero() {
+  const [q, setQ] = useState("");
+  const ask = (v?: string) => { const t = (v ?? q).trim(); if (t) window.location.hash = "#/ask/" + encodeURIComponent(t); };
   return (
     <section className="relative overflow-hidden border-b border-line">
       {/* faint ruled paper grid */}
@@ -88,16 +97,19 @@ function Hero() {
           <div className="mt-9 flex max-w-[560px] items-center gap-2 rounded-xl border border-line bg-surface p-2 pl-4 shadow-soft">
             <Magnifier />
             <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") ask(); }}
               placeholder="How did distributed consensus evolve?"
               className="min-w-0 flex-1 bg-transparent text-[15.5px] text-ink placeholder:text-faint focus:outline-none"
             />
             <kbd className="hidden rounded-md bg-surface-2 px-2 py-1 font-mono text-[11px] text-faint sm:block">⌘K</kbd>
-            <button className="rounded-lg bg-accent px-4 py-2.5 text-[14px] font-medium text-white">Ask</button>
+            <button onClick={() => ask()} className="rounded-lg bg-accent px-4 py-2.5 text-[14px] font-medium text-white">Ask</button>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2.5">
             {["Breakthroughs in transformers", "Open problems in database replication", "Evolution of operating systems"].map((c) => (
-              <button key={c} className="rounded-full border border-line bg-surface px-3 py-1.5 text-[12.5px] text-muted transition hover:border-ink/30 hover:text-ink">
+              <button key={c} onClick={() => ask(c)} className="rounded-full border border-line bg-surface px-3 py-1.5 text-[12.5px] text-muted transition hover:border-ink/30 hover:text-ink">
                 {c}
               </button>
             ))}
@@ -390,9 +402,23 @@ function useHashRoute() {
   return hash;
 }
 
+function Page({ route }: { route: string }) {
+  if (route.startsWith("#/problem/")) return <Problem short={decodeURIComponent(route.slice("#/problem/".length))} />;
+  if (route.startsWith("#/ask/")) return <Ask q={decodeURIComponent(route.slice("#/ask/".length))} />;
+  if (route.startsWith("#/explore")) return <Explore />;
+  if (route.startsWith("#/graph")) return <Graph />;
+  if (route.startsWith("#/scientist")) return <Scientist />;
+  if (route.startsWith("#/landmarks")) return <Landmarks />;
+  if (route.startsWith("#/dashboard")) return <Dashboard />;
+  return <Landing />;
+}
+
 export default function App() {
   const route = useHashRoute();
-  if (route.startsWith("#/problem/")) return <Problem short={decodeURIComponent(route.slice("#/problem/".length))} />;
-  if (route.startsWith("#/explore")) return <Explore />;
-  return <Landing />;
+  return (
+    <>
+      <Page route={route} />
+      <CommandPalette />
+    </>
+  );
 }
